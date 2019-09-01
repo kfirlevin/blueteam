@@ -3,6 +3,36 @@ import datetime
 import sys,os
 import inspect
 
+'''
+usage: 
+import the logger class : import logger 
+make instance of logger : log = logger.Logger()
+
+log.LogDebug(caller,message)
+
+caller  : where it was called from (file,function)
+message : your action (api req/res, attempts db connection)
+
+levels: 
+*debug* - for dev team to log debug stuff
+command : log.LogDebug("api/weight","testing stuff")
+output  : [2019-09-01 02:36:48,234] caller : api/weight | level - DEBUG : testing stuff
+
+*info* - log incoming/outgoing requests
+command : log.LogInfo("api/weight","log inc data")
+output  : [2019-09-01 02:36:48,234] caller : api/weight | level - INFO : log inc data
+
+*error* - low risk error
+command : log.LogError("api/weight","try parsing string to int")
+output  : [2019-09-01 02:36:48,237] caller : api/weight | level - ERROR : try parsing string to int
+
+*critical* - high risk error 
+command : a.LogCritical("api weight","attempt db connection")
+output  : [2019-09-01 02:36:48,237] caller : api weight | level - CRITICAL : AT /home/aweds/Desktop/develeap/task/blueteam/weight/config/logger.py attempt db connection
+
+IMPORTANT : critical log shows dir of file that failed the action
+'''
+
 
 class DebugLog:
     def __init__(self,caller):
@@ -22,7 +52,6 @@ class DebugLog:
         self.logger.addHandler(self.sh)
 
     def log(self,msg):
-        print(msg)
         self.logger.debug(msg)
 
 class InfoLog:
@@ -43,7 +72,6 @@ class InfoLog:
         self.logger.addHandler(self.sh)
 
     def log(self,msg):
-        print(msg)
         self.logger.info(msg)
 
 class ErrorLog:
@@ -64,7 +92,6 @@ class ErrorLog:
         self.logger.addHandler(self.sh)
 
     def log(self,msg):
-        print(msg)
         self.logger.error(msg)
 
 class CriticlLog:
@@ -85,7 +112,6 @@ class CriticlLog:
         self.logger.addHandler(self.sh)
 
     def log(self,msg):
-        print(msg)
         self.logger.critical(msg)
 
 

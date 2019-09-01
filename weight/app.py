@@ -9,7 +9,7 @@ config = {
   'password': 'password',
   'host': 'localhost',
   'port': '777',
-  'database': 'mydb',
+  'database': 'weight_db',
   'raise_on_warnings': True
 }
 
@@ -32,4 +32,4 @@ def health():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', debug=True)

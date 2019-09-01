@@ -2,10 +2,19 @@ version: '3'
 
 services:
   providers-db:
+    container_name: db
     build: ../providers/db/
+
   providers-server:
     build: ../providers/api/
     ports:
       - '8080:5000'
+
   weight-db:
+    container_name: mysql
     build: ../weight/Mysql-db/
+
+  weight-server:
+    build: ../weight/
+    ports:
+      - '8090:5000'

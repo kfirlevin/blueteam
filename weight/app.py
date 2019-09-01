@@ -1,28 +1,34 @@
 from flask import Flask, render_template, request
-from flask_mysqldb import MySQL
+import mysql.connector
+from mysql.connector import errorcode
+
 app = Flask(__name__)
 
+config = {
+  'user': 'db',
+  'password': 'password',
+  'host': 'localhost',
+  'port': '777',
+  'database': 'mydb',
+  'raise_on_warnings': True
+}
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'MyDB'
+# @app.route('/weight', methods=['POST'])
+# def saveWeight():
 
-mysql = MySQL(app)
-
-
-@app.route('/weight', methods=['POST'])
-def saveWeight():
-    details = request.form
-    firstName = details['fname']
-    lastName = details['lname']
-    cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO MyUsers(firstName, lastName) VALUES (%s, %s)", (firstName, lastName))
-    mysql.connection.commit()
-    cur.close()
-    return 'success'
-
-
+@app.route('/health', methods=['GET'])
+def health():
+    # mydb = mysql.connector.connect(**config)
+    # print(mydb)
+    # return 'mydb'
+    try:
+        cnx = mysql.connector.connect(**config)
+    except mysql.connector.Error as err:
+        print(err)
+        return 'Failure', 500
+    cnx.close()
+    return 'OK', 200
+    
 
 
 if __name__ == '__main__':

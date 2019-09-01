@@ -1,5 +1,5 @@
 from app import app
 
 @app.route('/truck')
-def provider():
+def truck():
     return "truck"

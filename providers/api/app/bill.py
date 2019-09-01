@@ -1,5 +1,5 @@
 from app import app
 
 @app.route('/bill')
-def health():
+def bill():
     return "bill"

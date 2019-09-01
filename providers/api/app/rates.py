@@ -1,5 +1,5 @@
 from app import app
 
 @app.route('/rates')
-def provider():
+def rates():
     return "rates"

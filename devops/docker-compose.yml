@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  providers-db:
+    build: ../providers/db/
+  weight-db:
+    build: ../weight/Mysql-db/

@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-ganshmoael
+    volumes:
+      - ~/datafiles:/var/lib/mysql
+      - ./weight-db.sql:/docker-entrypoint-initdb.d/weight-db.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: weight
+      MYSQL_USER: db
+      MYSQL_PASSWORD: password
+      RESTART: always
+    ports:
+      - "3306:3306"
+
+volumes:
+  container-volume:

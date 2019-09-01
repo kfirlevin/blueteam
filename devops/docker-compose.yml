@@ -3,5 +3,9 @@ version: '3'
 services:
   providers-db:
     build: ../providers/db/
+  providers-server:
+    build: ../providers/api/
+    ports:
+      - '8080:5000'
   weight-db:
     build: ../weight/Mysql-db/

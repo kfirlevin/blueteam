@@ -30,9 +30,28 @@ def truckPost(truckId,providerId):
     return dictionary
 
 
+def truckPut(truckId,providerId):
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor()
+    cursor.execute('''UPDATE Trucks SET provider_id = (select id from Provider where name = %s) where id = %s ;''', (providerId, truckId))
+    connection.commit()
+    cursor.execute('select * from Trucks where id = %s ;',(truckId,))
+    results = cursor.fetchall()
+    dictionary = {}
+    for key, value in results:
+        dictionary[key] = value 
+    cursor.close()
+    connection.close()
+    return dictionary
+
 @app.route('/truck',methods=['GET','POST','PUT'])
 def handleTruck():
     if request.method == 'POST':
         trcukId=request.args.get('id')
         providerId=request.args.get('provider')
         return json.dumps(truckPost(trcukId,providerId),sort_keys=True,indent=4)
+    
+    if request.method == 'PUT':
+        trcukId=request.args.get('id')
+        providerId=request.args.get('provider')
+        return json.dumps(truckPut(trcukId,providerId),sort_keys=True,indent=4)

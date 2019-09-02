@@ -1,4 +1,5 @@
 FROM python:3.7-alpine
+ENV DB_USER="root" DB_PASS="root" DB_HOST="db" 
 WORKDIR /usr/src/app
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt

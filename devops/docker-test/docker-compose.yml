@@ -14,7 +14,7 @@ services:
 
   weight-db:
     container_name: mysql
-    build: ../weight/Mysql-db/
+    build: ../../weight/Mysql-db/
     volumes:
       - ~/test-dbs/weight-data/:/var/lib/mysql
 

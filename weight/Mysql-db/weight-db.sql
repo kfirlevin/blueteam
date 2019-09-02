@@ -20,6 +20,15 @@ CREATE TABLE IF NOT EXISTS `containers_registered` (
   PRIMARY KEY (`container_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10001 ;
 
+
+
+
+INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-123123", 543 , "kg")
+INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-234234", 123 , "kg")
+INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-345345", 234 , "kg")
+INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-465445", 765 , "kg")
+INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-675676", 543 , "kg")
+INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-987898", 234 , "kg")
 -- --------------------------------------------------------
 
 --
@@ -39,6 +48,9 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   `produce` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10001 ;
+
+INSERT INTO `containers_registered`
+
 
 show tables;
 

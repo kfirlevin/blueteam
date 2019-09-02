@@ -58,8 +58,29 @@ def unknown_weights():
             list_of_unknown.append(row[0])
     return str(list_of_unknown)
 
-# @app.route('/')
-    
+  
+@app.route('/batch_weight', methods=['POST'])
+def batch_weight():
+
+
+
+    try:
+
+        f = request.files['file']
+        f.save(secure_filename(f.filename))
+
+
+
+        cnx = mysql.connector.connect(**config)
+
+
+
+    except mysql.connector.Error as err:
+        print(err)
+        return 'Failure', 500
+    cnx.close()
+    return 'OK', 200
+
 
 
 if __name__ == '__main__':

@@ -125,3 +125,5 @@ dmypy.json
 
 #MACOS 
 .DS_Store
+#VSCODE
+.vscode

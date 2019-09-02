@@ -14,4 +14,4 @@ services:
       - "3306:3306"
     volumes:
        - ~/datafiles:/var/lib/mysql
-       - ./Mysql-db/weight-db.sql:/docker-entrypoint-initdb.d/weight-db.sql
+       #- ./Mysql-db/weight-db.sql:/docker-entrypoint-initdb.d/weight-db.sql

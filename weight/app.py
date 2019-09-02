@@ -35,6 +35,7 @@ def weight_post():
         return "We're good" , 200        
     else:
         return 'Not a valid direction' , 400
+
     
 
 # @app.route('/')

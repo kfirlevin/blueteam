@@ -6,4 +6,4 @@ ENV MYSQL_DATABASE=weight
 ENV MYSQL_USER=db
 ENV MYSQL_PASSWORD=password
 ENV RESTART=always
-
+COPY weight-db.sql /docker-entrypoint-initdb.d/

@@ -10,7 +10,7 @@ services:
   providers-server:
     build: ../../providers/api/
     ports:
-      - '8080:5000'
+      - '8010:5000'
 
   weight-db:
     container_name: mysql
@@ -21,4 +21,4 @@ services:
   weight-server:
     build: ../weight/
     ports:
-      - '8090:5000'
+      - '8020:5000'

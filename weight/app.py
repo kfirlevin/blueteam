@@ -46,6 +46,13 @@ def executeMany(s1,s2):
 
 
 
+# @app.route('/weight', methods=['POST'])
+# def saveWeight():
+
+@app.route('/')
+def index():
+    return render_template("index.html")
+
 @app.route('/health', methods=['GET'])
 def health():
     # mydb = mysql.connector.connect(**config)
@@ -106,13 +113,17 @@ def weights_get():
 
     for row in rows:
         if row[2] in f:
+            if any(x in str(row[4]).split(',')  for x in unknown_weights()): #na if some of containers have unknown tara
+                neto = None
+            else:
+                neto = row[7]
             transact = {
                 'id': row[0],
                 'direction': row[2],
                 'bruto': row[5],
-                'neto': row[7],
+                'neto': neto,
                 'produce': row[8],
-                'containers': str(row[4]).split(',') # make a list use python to separate the string
+                'containers': str(row[4]).split(',') 
             }
             list_of_transactions.append(transact)
         
@@ -126,9 +137,9 @@ def unknown_weights():
     rows = exec_query(sql_select_Query)
 
     for row in rows:
-        if  not str(row[1]).isdigit():
+        if  (not row[1]) and (not str(row[1]).isdigit()):
             list_of_unknown.append(row[0])
-    return str(list_of_unknown)
+    return list_of_unknown
 
 
 @app.route('/batch-weight', methods=['POST'])
@@ -163,13 +174,25 @@ def batch_weight():
 
 
 #GET /weight?from=t1&to=t2&filter=f
-@app.route('/weight', methods=['GET'])
+@app.route('/all_con', methods=['GET'])
 def get_weight():
 
     sql_select_Query = """select * from containers_registered"""
     rows = exec_query(sql_select_Query)
 
-    return str(rows)
+    list_of_unknown = []
+
+    for row in rows:
+         list_of_unknown.append(
+           {
+            "container_id": row[0],
+            "weight": row[1],
+            "unit": row[2]
+            }
+         )
+
+
+    return str(list_of_unknown)
 
 
 ## GET /item/<id>?from=t1&to=t2

@@ -118,7 +118,7 @@ def unknown_weights():
     rows = exec_query(sql_select_Query)
 
     for row in rows:
-        if  not str(row[1]).isdigit():
+        if  (not row[1]) and (not str(row[1]).isdigit()):
             list_of_unknown.append(row[0])
     return str(list_of_unknown)
 

@@ -6,6 +6,9 @@ import mysql.connector
 import json
 import os
 from . import db
+import logging
+import sys
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 config = {
 'user': os.environ.get('DB_USER'),
@@ -18,8 +21,10 @@ config = {
 def truckPost(truckId,providerId):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
-    cursor.execute('''INSERT INTO Trucks (id,provider_id) VALUES (%s, %s);''', (truckId, providerId))
+    query = "INSERT INTO Trucks (id,provider_id) VALUES (%s, %s);"
+    cursor.execute(query, (truckId, providerId))
     connection.commit()
+    logging.info(query,(truckId, providerId))
     cursor.execute('select * from Trucks')
     results = cursor.fetchall()
     dictionary = {}
@@ -33,7 +38,8 @@ def truckPost(truckId,providerId):
 def truckPut(truckId,providerId):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
-    cursor.execute('''UPDATE Trucks SET provider_id = (select id from Provider where name = %s) where id = %s ;''', (providerId, truckId))
+    query = "UPDATE Trucks SET provider_id = (select id from Provider where name = %s) where id = %s ;"
+    cursor.execute(query, (providerId, truckId))
     connection.commit()
     cursor.execute('select * from Trucks where id = %s ;',(truckId,))
     results = cursor.fetchall()
@@ -49,6 +55,7 @@ def handleTruck():
     if request.method == 'POST':
         trcukId=request.args.get('id')
         providerId=request.args.get('provider')
+        #res = truckPost(trcukId,providerId)
         return json.dumps(truckPost(trcukId,providerId),sort_keys=True,indent=4)
     
     if request.method == 'PUT':

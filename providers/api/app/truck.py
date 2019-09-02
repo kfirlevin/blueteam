@@ -18,6 +18,7 @@ config = {
 'database': 'billdb'
 }
 
+
 def truckPost(truckId,providerId):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
@@ -41,6 +42,7 @@ def truckPut(truckId,providerId):
     query = "UPDATE Trucks SET provider_id = (select id from Provider where name = %s) where id = %s ;"
     cursor.execute(query, (providerId, truckId))
     connection.commit()
+    logging.info(query,(truckId, providerId))
     cursor.execute('select * from Trucks where id = %s ;',(truckId,))
     results = cursor.fetchall()
     dictionary = {}
@@ -50,7 +52,7 @@ def truckPut(truckId,providerId):
     connection.close()
     return dictionary
 
-@app.route('/truck',methods=['GET','POST','PUT'])
+@app.route('/truck',methods=['POST','PUT'])
 def handleTruck():
     if request.method == 'POST':
         trcukId=request.args.get('id')

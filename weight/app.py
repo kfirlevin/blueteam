@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
-from mysql.connector import errorcode
 import datetime
 import csv
+from typing import Dict, List
 
 app = Flask(__name__)
 
@@ -27,12 +27,24 @@ def exec_query(sql_select_Query):
         cnx.close()
         return 'Failure', 500
     cnx.close()
-    return rows;
+    return rows
+def executeMany(s1,s2):
+    try:
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        cursor.executemany(s1,s2)
+        conn.commit()   
+    except mysql.connector.Error as err:
+        print(err)
+        conn.close()
+        return 'Failure', 500
+    except Error as e:
+        print('Error:', e)
+    finally:
+        cursor.close()
+        conn.close()
 
 
-
-# @app.route('/weight', methods=['POST'])
-# def saveWeight():
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -106,10 +118,6 @@ def weights_get():
         
     return jsonify({'transactions': list_of_transactions})
 
-
-
-
-
 @app.route('/unknown', methods=['GET'])
 def unknown_weights():
 
@@ -123,24 +131,16 @@ def unknown_weights():
     return str(list_of_unknown)
 
 
-  
 @app.route('/batch-weight', methods=['POST'])
 def batch_weight():
     fileName = request.form.get('file')
-    # file=open("in/"+fileName,'r')
-    # data=file.read()
-    # file.close()
     spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
-    #print(spamReader.headline)
     ids=[]
     weights=[]
     for row in spamReader:
         ids.append(row[0])
         weights.append(row[1])
-        # print(row[1])
-        # print(type(row))
-        print(row)
-        #print(', '.join(row))
+        #print(row)
     if str(weights[0]) == '"lbs"':
         convert=True
     else:
@@ -149,16 +149,16 @@ def batch_weight():
     ids.pop(0)
     if convert:
         for i in range (len(weights)):
-            #item=(0.453592*float(item))
             weights[i] = str(int(0.453592*float(weights[i])))
+            ids[i]='"' + ids[i] + '"'
     for i in range(len(ids)):
-        print("id:"+ids[i]+", weight: "+weights[i])
-#@app.route('/batch_weight', methods=['POST'])
-#    for row in rows:
- #       if  not str(row[1]).isdigit():
-  #          list_of_unknown.append(row[0])
-   # return str(list_of_unknown)
-    return ("ok?")
+        #print("id:"+ids[i]+", weight: "+weights[i])
+        #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
+        query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
+        print(query)
+        exec_query(query)
+        print(query)
+    return ('yo')
 
 
 

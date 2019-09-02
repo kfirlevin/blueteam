@@ -1,10 +1,14 @@
 from app import app
-from flask import Flask, render_template, redirect, request, make_response
+from flask import Flask, render_template, redirect, request, Response
 from urllib.parse import urlparse
 from typing import List, Dict
 import mysql.connector
 import json
 import os
+import logging
+import sys 
+
+logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 from . import db
 
 def health():
@@ -15,20 +19,22 @@ def health():
     'port': '3306',
     'database': 'billdb'
     }
-    connection = mysql.connector.connect(**config)
-    cursor = connection.cursor()
-    cursor.execute('SELECT 1;')
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return results
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        cursor.execute('SELECT 1;')
+        results = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return 0
+    except:
+        return 1
 
 @app.route('/health')
 def handle_health():
     res = health()
-    if res:
-        resp = make_response()
-        resp.headers['Content-Type'] = 'text/plain'
+    if res == 0:
+        logging.info('HEALTH!')
         return """<html><body><pre>
  ___ _,_ _  _,       _  _,        _,       _,_ __,  _, _,  ___ _,_ , _  
   |  |_| | (_        | (_        /_\       |_| |_  /_\ |    |  |_| \ |  
@@ -40,3 +46,6 @@ def handle_health():
      | \ |   , ) |   \ / | \| , ) |                                     
      ~ ~ ~~~  ~  ~    ~  ~  ~  ~  ~~~                                   </pre></body></html>
 """
+    else:
+        logging.error('HEALTH ERROR!')
+        return Response('server error', status=500)

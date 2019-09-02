@@ -3,16 +3,20 @@ version: '3'
 services:
   providers-db:
     container_name: db
-    build: ../providers/db/
+    build: ../../providers/db/
+    volumes:
+      - ~/test-dbs/providers-data/:/var/lib/mysql
 
   providers-server:
-    build: ../providers/api/
+    build: ../../providers/api/
     ports:
       - '8080:5000'
 
   weight-db:
     container_name: mysql
     build: ../weight/Mysql-db/
+    volumes:
+      - ~/test-dbs/weight-data/:/var/lib/mysql
 
   weight-server:
     build: ../weight/

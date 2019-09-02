@@ -1,5 +1,5 @@
 from app import app
-from flask import request
+from flask import request, send_from_directory
 import pandas as ps
 from pandas import ExcelFile
 import mysql.connector
@@ -7,6 +7,8 @@ import os
 import logging
 import sys
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+last_file_name = ''
 
 
 @app.route('/rates', methods=['GET', 'POST'])
@@ -22,6 +24,8 @@ def rates():
     cursor = connection.cursor()
     if request.method == 'POST':
         file = request.args.get('file')
+        global last_file_name
+        last_file_name = file
         df = ps.read_excel('/in/' + file, sheet_name='rates')
         cursor.execute('DELETE FROM Rates')
         sql = 'INSERT INTO Rates (product_id, rate, scope) values '
@@ -34,16 +38,9 @@ def rates():
         logging.info(sql)
         cursor.execute(sql)
     elif request.method == 'GET':
-        sql = 'SELECT * from Rates'
-        cursor.execute(sql)
-        logging.info(sql)
-        results = ''
-        try:
-            results = cursor.fetchall()
-        except Exception as e:
-            logging.error(e)
-            results = e
-        return results
+        return send_from_directory(directory='/in/',
+                                   filename=last_file_name,
+                                   as_attachment=True)
     cursor.close()
     connection.close()
     return "rates"

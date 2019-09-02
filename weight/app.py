@@ -9,7 +9,7 @@ app = Flask(__name__)
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'localhost',
+  'host': 'mysql',
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True

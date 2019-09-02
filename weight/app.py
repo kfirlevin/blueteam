@@ -13,20 +13,19 @@ config = {
   'raise_on_warnings': True
 }
 
-
-# "select * from"
+# execute Query
 def exec_query(sql_select_Query):
     try:
         cnx = mysql.connector.connect(**config)
-        cnx.execute(sql_select_Query)
-        rows = cnx.fetchall()
+        cursor = cnx.cursor()
+        cursor.execute(sql_select_Query)
+        rows = cursor.fetchall()
     except mysql.connector.Error as err:
         print(err)
         cnx.close()
         return 'Failure', 500
     cnx.close()
     return rows;
-
 
 
 
@@ -57,18 +56,10 @@ def weight_post():
 
 @app.route('/unknown', methods=['GET'])
 def unknown_weights():
-    try:
-        cnx = mysql.connector.connect(**config)
-    except mysql.connector.Error as err:
-        print(err)
-        return 'Failure', 500
-    
+ 
     list_of_unknown = []
-
     sql_select_Query = "select * from containers_registered"
-    cursor = cnx.cursor()
-    cursor.execute(sql_select_Query)
-    rows = cursor.fetchall()
+    rows = exec_query(sql_select_Query)
 
     for row in rows:
         if  not str(row[1]).isdigit():
@@ -78,18 +69,11 @@ def unknown_weights():
   
 @app.route('/batch_weight', methods=['POST'])
 def batch_weight():
-
-
-
     try:
-
         f = request.files['file']
         f.save(secure_filename(f.filename))
-
         cnx = mysql.connector.connect(**config)
-
-
-
+        
     except mysql.connector.Error as err:
         print(err)
         return 'Failure', 500
@@ -100,13 +84,28 @@ def batch_weight():
 #GET /weight?from=t1&to=t2&filter=f
 @app.route('/weight', methods=['GET'])
 def get_weight():
-    sql_select_Query = "select 1 "
+
+    sql_select_Query = """select * from containers_registered"""
     rows = exec_query(sql_select_Query)
 
-    for row in rows:
-        print(row)
-        
-    return rows
+    return str(rows)
+
+
+## GET /item/<id>?from=t1&to=t2
+@app.route('/item', methods=['GET']) # TODO
+def get_item():
+    sql_select_Query = "select * from containers_registered"
+    rows = exec_query(sql_select_Query)
+
+    return str(rows)
+
+# GET /session/<id>
+@app.route('/session', methods=['GET']) # TODO
+def get_session():
+    sql_select_Query = "select * from containers_registered"
+    rows = exec_query(sql_select_Query)
+
+    return str(rows)
 
 
 if __name__ == '__main__':

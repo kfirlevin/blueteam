@@ -29,13 +29,14 @@ def health():
     cnx.close()
     return 'OK', 200
 @app.route('/weight', methods=['POST'])
-    direction = request.form.get('direction')
-    if direction =! 'in' or direction != 'out' or direction != 'none'
+def weight_post():
+    direction = request.form.get('direction')   
+    if direction != 'in' or direction != 'out' or direction != 'none':
         return 'Not a valid direction' , 400
     else:
         return "We're good" , 200
 
-@app.route('/')
+# @app.route('/')
     
 
 

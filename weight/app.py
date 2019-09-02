@@ -95,13 +95,17 @@ def weights_get():
 
     for row in rows:
         if row[2] in f:
+            if any(x in str(row[4]).split(',')  for x in unknown_weights()): #na if some of containers have unknown tara
+                neto = None
+            else:
+                neto = row[7]
             transact = {
                 'id': row[0],
                 'direction': row[2],
                 'bruto': row[5],
-                'neto': row[7],
+                'neto': neto,
                 'produce': row[8],
-                'containers': str(row[4]).split(',') # make a list use python to separate the string
+                'containers': str(row[4]).split(',') 
             }
             list_of_transactions.append(transact)
         
@@ -121,7 +125,7 @@ def unknown_weights():
     for row in rows:
         if  (not row[1]) and (not str(row[1]).isdigit()):
             list_of_unknown.append(row[0])
-    return str(list_of_unknown)
+    return list_of_unknown
 
 
   

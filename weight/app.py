@@ -13,6 +13,23 @@ config = {
   'raise_on_warnings': True
 }
 
+
+# "select * from"
+def exec_query(sql_select_Query):
+    try:
+        cnx = mysql.connector.connect(**config)
+        cnx.execute(sql_select_Query)
+        rows = cnx.fetchall()
+    except mysql.connector.Error as err:
+        print(err)
+        cnx.close()
+        return 'Failure', 500
+    cnx.close()
+    return rows;
+
+
+
+
 # @app.route('/weight', methods=['POST'])
 # def saveWeight():
 
@@ -49,8 +66,6 @@ def batch_weight():
         f = request.files['file']
         f.save(secure_filename(f.filename))
 
-
-
         cnx = mysql.connector.connect(**config)
 
 
@@ -61,6 +76,17 @@ def batch_weight():
     cnx.close()
     return 'OK', 200
 
+
+#GET /weight?from=t1&to=t2&filter=f
+@app.route('/weight', methods=['GET'])
+def get_weight():
+    sql_select_Query = "select 1 "
+    rows = exec_query(sql_select_Query)
+
+    for row in rows:
+        print(row)
+        
+    return rows
 
 
 if __name__ == '__main__':

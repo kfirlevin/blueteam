@@ -19,15 +19,51 @@
     - Json
 - Ad hoc weigh on site
 
+Weight	
+	
+- [x] Create base flask application
+- [x] Create dev docker file 
+- [x] GET /health
 
-REST
-
+- [ ] POST /batch-weight  (called by admin) - TODO
+    - upload file function
+    - convert json to csv function
+    - reading csv file to list objects 
+    - add object to database 
+    - implement API use functions  
+    - update docker file 
+    
+- [ ] Test - POST /batch-weight - TODO 
+    - testing api
+    - testing upload
+    - testing add object to db 
+    - convert json to csv
+    
+- [ ] GET /weight?from=t1&to=t2&filter=f (report by time) -  TODO 
+    - - format date
+    - insert query & execute it in def func(from,to,filter)
+        - default from - day in week
+        - default to  - now
+        - default filter = “in,out,none”
+    - execute query and convert data result to json 
+    
+    
+- [ ] GET/unknown (called by admin) - TODO
+    - select where weigth unknown - query 
+    - func exec query
+    - return json result
+    
+    
+    
+- [ ] GET/ item/<id> (truck/container report) 
+- [ ] GET /session/<id> (weighing report) 
 - [ ] POST /weight (called by new weight)
-- [ ] POST /batch-weight (called by admin)
-- [ ] GET /unknown (called by admin)
-- [ ] GET /weight (report by time)
-- [ ] GET /item/<id> (truck/container report)
-- [ ] GET /session/<id> (weighing report)
+
+
+![d964392a6d44b5206c153b302c853c7f.png](:/22b85180b5b2493abdea0d2756eea7cf)
+
+
+
 
 
 
@@ -75,6 +111,57 @@ Return value on success is:
 Will upload list of tara weights from a file in "/in" folder. Usually used to accept a batch of new containers. 
 File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"unit":..},...])
 ```
+https://www.tutorialspoint.com/flask/flask_file_uploading.htm
+
+https://www.w3schools.com/python/python_json.asp
+
+http://blog.appliedinformaticsinc.com/how-to-parse-and-convert-json-to-csv-using-python/
+
+https://www.youtube.com/watch?v=QBq1ScifuaE
+
+https://docs.python.org/3/library/csv.html
+
+```
+import pymysql
+import codecs
+import csv
+import urllib2
+import pymysql.cursors
+
+# Get URL Data
+url = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv"
+URLstream = urllib2.urlopen(url)
+csvfile = csv.reader(codecs.iterdecode(URLstream, 'utf-8'))
+
+# Connect to the database
+
+connection = pymysql.connect(host='b8con.no-ip.org', user='HanSolo', password='password', db='EarthQuake', charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+
+try:
+    with connection.cursor() as cursor:
+        sql = "INSERT INTO quakedata(time, latitude, longitude, depth, mag, magType, nst, gap, dmin, rms, net, id, updated, place, type) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        next(csvfile, None)
+        for line in csvfile:
+            cursor.execute(sql, (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12], line[13], line[14]))
+
+finally:
+    connection.commit()
+    connection.close()
+    
+```
+
+- upload file function
+- convert json to csv function
+- reading csv file to list objects 
+- add object to database 
+- implement API use functions  
+- testing 
+    - testing api
+    - testing upload
+    - testing add object to db 
+    - convert json to csv
+- update docker file 
+
 
 ## GET /unknown
 
@@ -82,6 +169,10 @@ File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"u
 Returns a list of all recorded containers that have unknown weight:
 ["id1","id2",...]
 ```
+- select data 
+- https://pynative.com/python-mysql-select-query-to-fetch-data/ 
+
+
 ## GET /weight?from=t1&to=t2&filter=f
 ```
 - t1,t2 - date-time stamps, formatted as yyyymmddhhmmss. server time is assumed.
@@ -97,6 +188,19 @@ returns an array of json objects, one per weighing (batch NOT included):
 },...]
 ```
 
+
+[{ "id": <id>,
+   "direction": in/out/none,
+   "bruto": <int>, //in kg
+   "neto": <int> or "na" // na if some of containers have unknown tara
+   "produce": <str>,
+   "containers": [ id1, id2, ...]
+},...]
+
+see : 
+https://pynative.com/python-mysql-select-query-to-fetch-data/ 
+
+```
 ## GET /item/<id>?from=t1&to=t2
 ```
 - id is for an item (truck or container). 404 will be returned if non-existent
@@ -108,6 +212,7 @@ Returns a json:
   "sessions": [ <id1>,...] 
 }
 ```
+
 
 ## GET /session/<id>
 ```

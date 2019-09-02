@@ -9,7 +9,7 @@ app = Flask(__name__)
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'mysql',
+  'host': 'localhost',
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True
@@ -31,8 +31,9 @@ def exec_query(sql_select_Query):
 
 
 
-# @app.route('/weight', methods=['POST'])
-# def saveWeight():
+@app.route('/')
+def index():
+    return render_template("index.html")
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -163,13 +164,25 @@ def batch_weight():
 
 
 #GET /weight?from=t1&to=t2&filter=f
-@app.route('/weight', methods=['GET'])
+@app.route('/all_con', methods=['GET'])
 def get_weight():
 
     sql_select_Query = """select * from containers_registered"""
     rows = exec_query(sql_select_Query)
+    
+    list_of_unknown = []
 
-    return str(rows)
+    for row in rows:
+         list_of_unknown.append(
+           {
+            "container_id": row[0],
+            "weight": row[1],
+            "unit": row[2]
+            }
+         )
+     
+
+    return str(list_of_unknown)
 
 
 ## GET /item/<id>?from=t1&to=t2

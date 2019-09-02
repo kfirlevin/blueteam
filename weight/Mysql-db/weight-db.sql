@@ -54,7 +54,19 @@ describe transactions;
 -- Dumping data for table `containers_registered`
 --
 
-INSERT INTO `containers_registered` (`container_id`, `weight`, `unit`)
+INSERT INTO `containers_registered` (`container_id`, `weight`, `unit`  )
+VALUES 
+("T-123523", 543 , "kg"),
+("T-234234", 123 , "kg"),
+("T-345345", 234 , "kg"),
+("T-465445", 765 , "kg"),
+("T-675676", 543 , "kg"),
+("T-985598",  null , "kg"),
+("T-983338",  null , "kg"),
+("T-912228",  null , "kg");
+
+
+INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`)
 VALUES 
 ("T-123523", 543 , "kg"),
 ("T-234234", 123 , "kg"),

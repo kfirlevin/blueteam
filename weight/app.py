@@ -9,7 +9,7 @@ config = {
   'password': 'password',
   'host': 'mysql',
   'port': '3306',
-  'database': 'weight_db',
+  'database': 'weight',
   'raise_on_warnings': True
 }
 
@@ -31,10 +31,11 @@ def health():
 @app.route('/weight', methods=['POST'])
 def weight_post():
     direction = request.form.get('direction')   
-    if direction != 'in' or direction != 'out' or direction != 'none':
-        return 'Not a valid direction' , 400
+    if direction in ['in', 'out', 'none']:
+        return "We're good" , 200        
     else:
-        return "We're good" , 200
+        return 'Not a valid direction' , 400
+    
 
 # @app.route('/')
     

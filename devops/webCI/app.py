@@ -9,5 +9,10 @@ def push():
         if request.headers['Content-Type'] == 'application/json':
             auto_docker.activate_docker()
             return json.dumps(request.json)
-    else if request.method == 'GET':
+    elif request.method == 'GET':
         return "This is WebCI"
+
+
+#@app.route('/commit', methods=['POST', 'GET'])
+#def commitLog():
+    

@@ -1,4 +1,12 @@
-FROM python
-RUN pip install flask
+FROM docker/compose:1.25.0-rc2
+
+RUN apk add --update \
+    python3 \
+    py-pip \
+    git \
+    && pip install flask
+
+
 WORKDIR /app
 COPY . .
+ENTRYPOINT flask run --host=0.0.0.0

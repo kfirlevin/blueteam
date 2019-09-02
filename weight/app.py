@@ -46,6 +46,7 @@ def health():
     cnx.close()
     return 'OK', 200
 
+
 @app.route('/weight', methods=['POST'])
 def weight_post():
     direction = request.form.get('direction')   
@@ -54,6 +55,25 @@ def weight_post():
     else:
         return 'Not a valid direction' , 400
 
+@app.route('/unknown', methods=['GET'])
+def unknown_weights():
+    try:
+        cnx = mysql.connector.connect(**config)
+    except mysql.connector.Error as err:
+        print(err)
+        return 'Failure', 500
+    
+    list_of_unknown = []
+
+    sql_select_Query = "select * from containers_registered"
+    cursor = cnx.cursor()
+    cursor.execute(sql_select_Query)
+    rows = cursor.fetchall()
+
+    for row in rows:
+        if  not str(row[1]).isdigit():
+            list_of_unknown.append(row[0])
+    return str(list_of_unknown)
 
   
 @app.route('/batch_weight', methods=['POST'])

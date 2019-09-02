@@ -2,11 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import datetime
 import csv
-<<<<<<< HEAD
-from typing import Dict, List
-=======
 from config.logger import Logger
->>>>>>> master
 
 app = Flask(__name__)
 
@@ -49,13 +45,6 @@ def executeMany(s1,s2):
         conn.close()
 
 
-<<<<<<< HEAD
-
-# @app.route('/weight', methods=['POST'])
-# def saveWeight():
-
-=======
->>>>>>> master
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -130,10 +119,6 @@ def weights_get():
         
     return jsonify({'transactions': list_of_transactions})
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @app.route('/unknown', methods=['GET'])
 def unknown_weights():
 
@@ -146,40 +131,9 @@ def unknown_weights():
             list_of_unknown.append(row[0])
     return jsonify({'list_of_unknown': list_of_unknown})
 
-<<<<<<< HEAD
-@app.route('/batch-weight', methods=['POST'])
-def batch_weight():
-    fileName = request.form.get('file')
-    spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
-    ids=[]
-    weights=[]
-    for row in spamReader:
-        ids.append(row[0])
-        weights.append(row[1])
-        #print(row)
-    if str(weights[0]) == '"lbs"':
-        convert=True
-    else:
-        convert=False
-    weights.pop(0)
-    ids.pop(0)
-    if convert:
-        for i in range (len(weights)):
-            weights[i] = str(int(0.453592*float(weights[i])))
-            ids[i]='"' + ids[i] + '"'
-    for i in range(len(ids)):
-        #print("id:"+ids[i]+", weight: "+weights[i])
-        #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
-        query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
-        print(query)
-        exec_query(query)
-        print(query)
-    return ('yo')
-=======
   
 @app.route('/batch-weight',  methods = ['GET', 'POST'])
 def batch_weight():
->>>>>>> master
 
     if request.method == 'GET':
         return render_template("betch-weight.html")

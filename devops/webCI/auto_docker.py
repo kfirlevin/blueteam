@@ -7,7 +7,7 @@ def activate_docker(environment='Testing'):
     #     cmd += '-f ../docker-prod/docker-compose.yml up -d'
     #     os.system(cmd)
     # else:
-    cmd += '-f /app/blueteam/devops/docker-test/docker-compose.yml up'
+    cmd += '-f /app/blueteam/devops/docker-test/docker-compose.yml up --build'
     os.system(cmd)
 
 

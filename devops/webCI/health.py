@@ -6,7 +6,7 @@ import requests
 
 def getApi(port, api):
     try:
-        response = requests.get('http://localhost:' + port + api)
+        response = requests.get('http://blue.develeap.com:' + port + api)
         response.raise_for_status()
     except HTTPError as http_err:
         # if api not found
@@ -25,8 +25,8 @@ def getApi(port, api):
 
 
 def testAPI():
-    health1 = getApi('8010/', 'health')
-    health2 = getApi('8020/', 'health')
+    health1 = getApi('8081/', 'health')
+    health2 = getApi('8082/', 'health')
     # first checking health's api's
     if health1 == False or health2 == False:
         return False

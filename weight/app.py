@@ -28,6 +28,7 @@ def health():
         return 'Failure', 500
     cnx.close()
     return 'OK', 200
+
 @app.route('/weight', methods=['POST'])
 def weight_post():
     direction = request.form.get('direction')   
@@ -36,10 +37,30 @@ def weight_post():
     else:
         return 'Not a valid direction' , 400
 
-    
 
-# @app.route('/')
-    
+  
+@app.route('/batch_weight', methods=['POST'])
+def batch_weight():
+
+
+
+    try:
+
+        f = request.files['file']
+        f.save(secure_filename(f.filename))
+
+
+
+        cnx = mysql.connector.connect(**config)
+
+
+
+    except mysql.connector.Error as err:
+        print(err)
+        return 'Failure', 500
+    cnx.close()
+    return 'OK', 200
+
 
 
 if __name__ == '__main__':

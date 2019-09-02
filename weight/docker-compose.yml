@@ -1,17 +1,17 @@
 version: "3"
 
 services:
-  flask:
-    build: .
-    depends_on:
-      - mysql
-    ports:
-      - "5000:5000"
-    
-  mysql:
+  weight-db:
+    container_name: mysql
     build: ./Mysql-db
     ports:
       - "3306:3306"
     volumes:
-       - ~/datafiles:/var/lib/mysql
+       - ~/prod-dbs/weight-data/:/var/lib/mysql
        #- ./Mysql-db/weight-db.sql:/docker-entrypoint-initdb.d/weight-db.sql
+  weight-server:
+    build: .
+    depends_on:
+      - weight-db
+    ports:
+      - "5000:5000"

@@ -2,14 +2,18 @@ from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import datetime
 import csv
+<<<<<<< HEAD
 from typing import Dict, List
+=======
+from config.logger import Logger
+>>>>>>> master
 
 app = Flask(__name__)
 
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'mysql',
+  'host': 'weight-db',
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True
@@ -45,19 +49,19 @@ def executeMany(s1,s2):
         conn.close()
 
 
+<<<<<<< HEAD
 
 # @app.route('/weight', methods=['POST'])
 # def saveWeight():
 
+=======
+>>>>>>> master
 @app.route('/')
 def index():
     return render_template("index.html")
 
 @app.route('/health', methods=['GET'])
 def health():
-    # mydb = mysql.connector.connect(**config)
-    # print(mydb)
-    # return 'mydb'
     try:
         cnx = mysql.connector.connect(**config)
     except mysql.connector.Error as err:
@@ -76,8 +80,6 @@ def weight_post():
         return 'Not a valid direction' , 400
 
 
-
-
 @app.route('/weight', methods=['GET'])
 def weights_get():
     try:
@@ -86,7 +88,6 @@ def weights_get():
         print(err)
         return 'Failure', 500
 
-    
     time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
 
     if request.args.get('from')is None:
@@ -129,6 +130,10 @@ def weights_get():
         
     return jsonify({'transactions': list_of_transactions})
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 @app.route('/unknown', methods=['GET'])
 def unknown_weights():
 
@@ -139,9 +144,9 @@ def unknown_weights():
     for row in rows:
         if  (not row[1]) and (not str(row[1]).isdigit()):
             list_of_unknown.append(row[0])
-    return list_of_unknown
+    return jsonify({'list_of_unknown': list_of_unknown})
 
-
+<<<<<<< HEAD
 @app.route('/batch-weight', methods=['POST'])
 def batch_weight():
     fileName = request.form.get('file')
@@ -170,8 +175,44 @@ def batch_weight():
         exec_query(query)
         print(query)
     return ('yo')
+=======
+  
+@app.route('/batch-weight',  methods = ['GET', 'POST'])
+def batch_weight():
+>>>>>>> master
 
+    if request.method == 'GET':
+        return render_template("betch-weight.html")
+    elif request.method == 'POST':
+        try:
+            fileName = request.form.get('file')
+            spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
+            ids=[]
+            weights=[]
+            for row in spamReader:
+                ids.append(row[0])
+                weights.append(row[1])
+                print(row)
 
+            if str(weights[0]) == '"lbs"':
+                convert=True
+            else:
+                convert=False
+                
+            weights.pop(0)
+            ids.pop(0)
+
+            if convert:
+                for i in range (len(weights)):
+                    weights[i] = str(int(0.453592*float(weights[i])))
+
+            for i in range(len(ids)):
+                print("id:"+ids[i]+", weight: "+weights[i])
+                return "ok"
+
+        except IOError as e: # TODO write to LOGFILE
+              print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+              return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
 
 #GET /weight?from=t1&to=t2&filter=f
 @app.route('/all_con', methods=['GET'])
@@ -200,10 +241,9 @@ def get_weight():
 def get_item():
     sql_select_Query = "select * from containers_registered"
     rows = exec_query(sql_select_Query)
-
     return str(rows)
 
-# GET /session/<id>
+#   GET /session/<id>
 @app.route('/session', methods=['GET']) # TODO
 def get_session():
     sql_select_Query = "select * from containers_registered"

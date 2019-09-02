@@ -3,7 +3,6 @@ from flask import Flask, render_template, redirect, request, make_response
 from urllib.parse import urlparse
 from typing import List, Dict
 import mysql.connector
-import json
 import os
 import logging
 import sys 
@@ -12,10 +11,10 @@ logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 
 def sql(value):
     config = {
-    'user': "root",
-    'password': "root",
-    'host': "localhost",
-    'port': '5010',
+    'user': os.environ.get('DB_USER'),
+    'password': os.environ.get('DB_PASS'),
+    'host': os.environ.get('DB_HOST'),
+    'port': '3306',
     'database': 'billdb'
     }
     connection = mysql.connector.connect(**config)
@@ -28,6 +27,7 @@ def sql(value):
         connection.close()
         return re
     except:
+        logging.error(f"INSERT {value} IN TO PROVIDER FAILD!!!!!")
         return "ERROR"
 
 @app.route('/provider', methods=["POST"])
@@ -37,4 +37,4 @@ def provider():
     hh=sql(value)
     if (hh != "ERROR"):
         v1=hh[0]
-        return "{\"id\":\""+str(v1[-1])+"\"}"
+        return "{\"id\":\""+str(v1[-1])+"\"}"     

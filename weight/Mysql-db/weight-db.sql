@@ -22,13 +22,6 @@ CREATE TABLE IF NOT EXISTS `containers_registered` (
 
 
 
-
-INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-123123", 543 , "kg")
-INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-234234", 123 , "kg")
-INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-345345", 234 , "kg")
-INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-465445", 765 , "kg")
-INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-675676", 543 , "kg")
-INSERT INTO containers_registered (`container_id`, `weight`, `unit`) VALUES ("T-987898", 234 , "kg")
 -- --------------------------------------------------------
 
 --
@@ -49,8 +42,6 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10001 ;
 
-INSERT INTO `containers_registered`
-
 
 show tables;
 
@@ -60,8 +51,20 @@ describe transactions;
 
 
 --
--- Dumping data for table `test`
+-- Dumping data for table `containers_registered`
 --
 
--- INSERT INTO `test` (`id`, `aa`) VALUES
--- (1, 'aaaa'),
+INSERT INTO `containers_registered` (`container_id`, `weight`, `unit`)
+VALUES 
+("T-123523", 543 , "kg"),
+("T-234234", 123 , "kg"),
+("T-345345", 234 , "kg"),
+("T-465445", 765 , "kg"),
+("T-675676", 543 , "kg"),
+("T-985598",  null , "kg"),
+("T-983338",  null , "kg"),
+("T-912228",  null , "kg");
+
+show tables;
+
+SELECT * FROM `containers_registered`;

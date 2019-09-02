@@ -13,21 +13,24 @@ last_file_name = ''
 
 @app.route('/rates', methods=['GET', 'POST'])
 def rates():
-    config = {
-        'user': os.environ.get('DB_USER'),
-        'password': os.environ.get('DB_PASS'),
-        'host': os.environ.get('DB_HOST'),
-        'port': '3306',
-        'database': 'billdb'
-    }
-    connection = mysql.connector.connect(**config)
-    cursor = connection.cursor()
     if request.method == 'POST':
+        config = {
+            'user': os.environ.get('DB_USER'),
+            'password': os.environ.get('DB_PASS'),
+            'host': os.environ.get('DB_HOST'),
+            'port': '3306',
+            'database': 'billdb'
+        }
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
         file = request.args.get('file')
         global last_file_name
         last_file_name = file
         df = ps.read_excel('/in/' + file, sheet_name='rates')
-        cursor.execute('DELETE FROM Rates')
+        try:
+            cursor.execute('DELETE FROM Rates')
+        except:
+            return '', 500
         sql = 'INSERT INTO Rates (product_id, rate, scope) values '
         lines = []
         for i in df.index:
@@ -36,7 +39,11 @@ def rates():
                          '")')
         sql += ', \n'.join(lines)
         logging.info(sql)
-        cursor.execute(sql)
+        try:
+            cursor.execute(sql)
+        except:
+            return '', 500
+        return ''
     elif request.method == 'GET':
         return send_from_directory(directory='/in/',
                                    filename=last_file_name,

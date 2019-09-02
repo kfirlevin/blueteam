@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM python:3.6.8
 ENV DB_USER="root" DB_PASS="root" DB_HOST="db" 
 WORKDIR /usr/src/app
 COPY ./requirements.txt .

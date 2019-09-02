@@ -19,6 +19,6 @@ services:
       - ~/test-dbs/weight-data/:/var/lib/mysql
 
   weight-server:
-    build: ../weight/
+    build: ../../weight/
     ports:
       - '8020:5000'

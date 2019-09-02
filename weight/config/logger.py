@@ -33,7 +33,6 @@ output  : [2019-09-01 02:36:48,237] caller : api weight | level - CRITICAL : AT 
 IMPORTANT : critical log shows dir of file that failed the action
 '''
 
-
 class DebugLog:
     def __init__(self,caller):
         self.logger = logging.getLogger(caller)
@@ -128,4 +127,3 @@ class Logger:
         
     def LogCritical(self,caller,msg):
         CriticlLog(caller).log(msg)
-

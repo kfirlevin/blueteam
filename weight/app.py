@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import mysql.connector
 from mysql.connector import errorcode
 import datetime
@@ -43,7 +43,7 @@ def weight_post():
 
 
 @app.route('/weight', methods=['GET'])
-def unknown_weights():
+def weights_get():
     try:
         cnx = mysql.connector.connect(**config)
     except mysql.connector.Error as err:
@@ -51,33 +51,43 @@ def unknown_weights():
         return 'Failure', 500
 
     
-    time_actual = datetime.datetime.now().strftime("%Y/%m/%d%I%M%S")
-    if request.args.get('t1')is None:
-        pass
-    else:
-        t1 = request.args.get('t1')
-    
-    if request.args.get('t2')is None:
-        pass
-    else:
-        t2 = request.args.get('t2')
-    
-    if request.args.get('f')is None:
-        f = "in,out,none"
-    else:
-        f = request.args.get('f')
-    
-    list_of_unknown = []
+    time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
 
-    sql_select_Query = "select * from containers_registered"
+    if request.args.get('from')is None:
+        t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
+    else:
+        t1 = request.args.get('from')
+    
+    if request.args.get('to')is None:
+        t2 = time_actual
+    else:
+        t2 = request.args.get('to')
+    f = []
+    if request.args.get('filter')is None:
+        f = ["in","out","none"]
+    else:
+        f = str(request.args.get('filter')).split(',')
+    
+    sql_select_Query = "select * from transactions where " + "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
     cursor = cnx.cursor()
     cursor.execute(sql_select_Query)
     rows = cursor.fetchall()
 
+    list_of_transactions = []
+
     for row in rows:
-        if  not str(row[1]).isdigit():
-            list_of_unknown.append(row[0])
-    return str(time_actual)
+        if row[2] in f:
+            transact = {
+                'id': row[0],
+                'direction': row[2],
+                'bruto': row[5],
+                'neto': row[7],
+                'produce': row[8],
+                'containers': str(row[4]).split(',') # make a list use python to separate the string
+            }
+            list_of_transactions.append(transact)
+        
+    return jsonify({'transactions': list_of_transactions})
 
 
 

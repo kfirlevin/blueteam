@@ -10,7 +10,7 @@ services:
   providers-server:
     build: ../../providers/api/
     ports:
-      - '8080:5000'
+      - '8081:5000'
     environment:
       - DB_HOST="prov-db-test"
     volumes:
@@ -25,6 +25,6 @@ services:
   weight-server:
     build: ../../weight/
     ports:
-      - '8090:5000'
+      - '8082:5000'
     environment:
       - DB_HOST="weight-db-test"

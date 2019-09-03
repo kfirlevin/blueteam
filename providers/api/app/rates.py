@@ -42,12 +42,14 @@ def rates():
         try:
             cursor.execute(sql)
         except:
+            cursor.close()
+            connection.close()
             return '', 500
+        cursor.close()
+        connection.close()
         return ''
     elif request.method == 'GET':
         return send_from_directory(directory='/in/',
                                    filename=last_file_name,
                                    as_attachment=True)
-    cursor.close()
-    connection.close()
     return "rates"

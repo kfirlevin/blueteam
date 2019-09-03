@@ -9,7 +9,7 @@ import sys
 
 logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 
-def sql(value):
+def sql(value,req):
     config = {
     'user': os.environ.get('DB_USER'),
     'password': os.environ.get('DB_PASS'),
@@ -17,25 +17,52 @@ def sql(value):
     'port': '3306',
     'database': 'billdb'
     }
+
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
     try:
-        cursor.execute(f"INSERT INTO Provider (`name`) VALUES ('{value}')")
-        cursor.execute(f"SELECT id from Provider WHERE name='{value}' ")
-        re=cursor.fetchall()
+        cursor.execute(value)
+        if(req):
+                re=cursor.fetchall()
+                if(re==[]):
+                        re="ERROR"
+        else:
+                re="OK"
         cursor.close()
         connection.close()
-        logging.info(f"INSERT {value} INTO PROVIDER")
         return re
-    except Exception as e:
-        logging.error(e)
-        return 'error ' + str(e)
+    except:
+        logging.error(f"{value} FAILD!!!!!")
+        return "ERROR"
+
+
+@app.route('/provider', methods=["GET"])
+def provider_get():
+        return "WELCOM to providers please use PUT or POST request"
 
 @app.route('/provider', methods=["POST"])
 def provider():
-    value=request.args["provider_name"]
-    res=sql(value)
-    if 'error' in str(res):
-            return res
-    v1=res[0]
-    return "{\"id\":\""+str(v1[-1])+"\"}"
+        value=request.args["provider_name"]
+        logging.info(f"INSERT {value} IN TO PROVIDER")
+        sql(f"INSERT INTO Provider (`name`) VALUES ('{value}')",True)
+        hh=sql(f"SELECT id from Provider WHERE name='{value}' ",True)
+        if (hh != "ERROR"):
+                v1=hh[0]
+                return "{\"id\":\""+str(v1[-1])+"\"}"     
+
+@app.route('/provider/<id>', methods=["PUT"])
+def provider_put(id):
+        provider_name=request.args["provider_name"]
+        hh1=sql(f"SELECT id FROM Provider WHERE id = {id}",True)
+        if(hh1 !="ERROR"):
+                hh=sql(f"UPDATE Provider SET name = '{provider_name}' WHERE id = {id}",False)
+                logging.info(f"UPDATE {id} TO {provider_name}")
+                if (hh != "ERROR" ):
+                        return "VALUE UPDATED" 
+        else:
+                logging.error(f"{id} NOT FOUND")
+                return (f"{id} NOT FOUND",404)
+
+
+
+

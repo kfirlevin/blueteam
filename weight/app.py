@@ -43,7 +43,17 @@ def health():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['POST'])
 def weight_post():
-    direction = request.form.get('direction')
+    if request.method == 'GET':
+            return render_template("weight-form.html")
+    elif request.method == 'POST':
+        id = request.form.get('id')
+        datetime = request.form.get('datetime')
+        direction = request.form.get('direction')
+        truck = request.form.get('truck')
+        containers = request.form.get('containers')
+        bruto = request.form.get('bruto')
+        truckTara = request.form.get('truckTara')
+        produce = request.form.get('produce')
     if Connection.Mysql.isHealth() == True : 
         return Weight.weight_post(direction)
     return "Error: DB Connection"
@@ -193,18 +203,18 @@ def get_transaction():
 ## GET /item/<id>?from=t1&to=t2
 @app.route('/item', methods=['GET']) # TODO
 def get_item():
-    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1235123, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
+    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
     rows = Connection.Mysql.exec_query(sql_select_Query)
     return str(rows)
 
 # Author:
 # TODO Add Comments - Description
 #   GET /session/<id>
-@app.route('/session', methods=['GET']) # TODO
-def get_session():
-    sql_select_Query = "select * from containers_registered"
-    rows = Connection.Mysql.exec_query(sql_select_Query)
-    return str(rows)
+@app.route('/session/<id>', methods=['GET']) # TODO
+def get_session(id):
+    sql_select_Query = "select * from transactions where " + "id ='" + str(id)  + "'"
+    row = Connection.Mysql.exec_query(sql_select_Query)
+    return jsonify(Transaction.transactionToJson(row[0]))
 
 
 if __name__ == '__main__':

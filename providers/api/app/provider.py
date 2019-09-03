@@ -25,6 +25,7 @@ def sql(value):
         re=cursor.fetchall()
         cursor.close()
         connection.close()
+        logging.info(f"INSERT {value} INTO PROVIDER")
         return re
     except:
         logging.error(f"INSERT {value} IN TO PROVIDER FAILD!!!!!")
@@ -33,7 +34,6 @@ def sql(value):
 @app.route('/provider', methods=["POST"])
 def provider():
     value=request.args["provider_name"]
-    logging.info(f"INSERT {value} IN TO PROVIDER")
     hh=sql(value)
     if (hh != "ERROR"):
         v1=hh[0]

@@ -2,7 +2,7 @@ version: '3'
 
 services:
   providers-db:
-    container_name: db
+    container_name: prov-db-test
     build: ../../providers/db/
     volumes:
       - ~/test-dbs/providers-data/:/var/lib/mysql
@@ -10,10 +10,14 @@ services:
   providers-server:
     build: ../../providers/api/
     ports:
-      - '8010:5000'
+      - '8081:5000'
+    environment:
+      - DB_HOST=prov-db-test
+    volumes:
+      - ~/test-prov_rates/:/in/
 
   weight-db:
-    container_name: mysql
+    container_name: weight-db-test
     build: ../../weight/Mysql-db/
     volumes:
       - ~/test-dbs/weight-data/:/var/lib/mysql
@@ -21,4 +25,6 @@ services:
   weight-server:
     build: ../../weight/
     ports:
-      - '8020:5000'
+      - '8082:5000'
+    environment:
+      - DB_HOST=weight-db-test

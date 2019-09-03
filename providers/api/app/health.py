@@ -1,3 +1,4 @@
+from . import db
 from app import app
 from flask import Flask, render_template, redirect, request, Response
 from urllib.parse import urlparse
@@ -6,18 +7,18 @@ import mysql.connector
 import json
 import os
 import logging
-import sys 
+import sys
 
-logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
-from . import db
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
 
 def health():
     config = {
-    'user': os.environ.get('DB_USER'),
-    'password': os.environ.get('DB_PASS'),
-    'host': os.environ.get('DB_HOST'),
-    'port': '3306',
-    'database': 'billdb'
+        'user': os.environ.get('DB_USER'),
+        'password': os.environ.get('DB_PASS'),
+        'host': os.environ.get('DB_HOST'),
+        'port': '3306',
+        'database': 'billdb'
     }
     try:
         connection = mysql.connector.connect(**config)
@@ -29,6 +30,7 @@ def health():
         return 0
     except:
         return 1
+
 
 @app.route('/health')
 def handle_health():

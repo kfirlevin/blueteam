@@ -27,14 +27,15 @@ def sql(value):
         connection.close()
         logging.info(f"INSERT {value} INTO PROVIDER")
         return re
-    except:
-        logging.error(f"INSERT {value} IN TO PROVIDER FAILD!!!!!")
-        return "ERROR"
+    except Exception as e:
+        logging.error(e)
+        return 'error ' + str(e)
 
 @app.route('/provider', methods=["POST"])
 def provider():
     value=request.args["provider_name"]
-    hh=sql(value)
-    if (hh != "ERROR"):
-        v1=hh[0]
-        return "{\"id\":\""+str(v1[-1])+"\"}"     
+    res=sql(value)
+    if 'error' in str(res):
+            return res
+    v1=res[0]
+    return "{\"id\":\""+str(v1[-1])+"\"}"

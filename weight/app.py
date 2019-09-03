@@ -81,6 +81,7 @@ def unknown_weights():
 # Author:
 # TODO Add Comments - Description
 @app.route('/batch-weight',  methods = ['GET', 'POST'])
+@app.route('/batch-weight',  methods = ['GET', 'POST'])
 def batch_weight():
     if request.method == 'GET':
         return render_template("betch-weight.html")
@@ -120,18 +121,18 @@ def batch_weight():
                 print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
                 return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
               
-            if convert:
-                for i in range (len(weights)):
-                    weights[i] = str(int(0.453592*float(weights[i])))
-                    ids[i]='"' + ids[i] + '"'
-            for i in range(len(ids)):
-                #print("id:"+ids[i]+", weight: "+weights[i])
-                #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
-                query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
-                print(query)
-                Connection.Mysql.exec_query(query)
-                print(query)
-                return "OK"
+        if convert:
+            for i in range (len(weights)):
+                weights[i] = str(int(0.453592*float(weights[i])))
+                ids[i]='"' + ids[i] + '"'
+        for i in range(len(ids)):
+            #print("id:"+ids[i]+", weight: "+weights[i])
+            #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
+            query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
+            print(query)
+            Connection.Mysql.exec_query(query)
+            print(query)
+    return "OK"
 
 
 

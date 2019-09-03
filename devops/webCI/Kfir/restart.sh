@@ -7,7 +7,7 @@ cd /blueteam/devops/docker-test
 docker-compose up --build -d
 
 ## Testing
-status=$(python3 /app/health.py)
+status=$(python /app/health.py)
 if [ $status == "True" ]
 then
     docker-compose down
@@ -29,5 +29,7 @@ else
     do
         docker rmi $name -f
     done
-fi    
+fi
+docker images -qf dangling=true | xargs docker rmi
+
 popd

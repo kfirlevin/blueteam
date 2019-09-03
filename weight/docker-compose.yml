@@ -12,6 +12,6 @@ services:
     build: ./Mysql-db
     ports:
       - "3306:3306"
-  # volumes:
-  #     - ~/datafiles:/var/lib/mysql
-  #     - ./weight-db.sql:/docker-entrypoint-initdb.d/weight-db.sql
+    volumes:
+       - ~/datafiles:/var/lib/mysql
+       #- ./Mysql-db/weight-db.sql:/docker-entrypoint-initdb.d/weight-db.sql

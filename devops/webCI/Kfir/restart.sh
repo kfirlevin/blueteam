@@ -7,8 +7,8 @@ cd /blueteam/devops/docker-test
 docker-compose up --build -d
 
 ## Testing
-status=$(python3 health)
-if [ $status == "True"]
+status=$(python3 /app/health.py)
+if [ $status == "True" ]
 then
     docker-compose down
     for name in ${test_names[@]}
@@ -23,5 +23,11 @@ then
         docker rmi $name -f
     done
     docker-compose up --build -d
-
+else
+    docker-compose down
+    for name in ${test_names[@]}
+    do
+        docker rmi $name -f
+    done
+fi    
 popd

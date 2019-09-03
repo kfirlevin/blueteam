@@ -9,12 +9,10 @@ from classes.Transaction import Transaction
 import os
 
 app = Flask(__name__)
-host = os.environ.get('MYSQL_HOST')
-print(host)
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'weight-db',
+  'host': os.environ.get('MYSQL_HOST'),
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True

@@ -1,5 +1,5 @@
 #!/bin/bash
 pushd .
 cd /blueteam/devops/docker-prod
-docker-compose up --build
+docker-compose up --build -d
 popd

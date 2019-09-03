@@ -1,13 +1,6 @@
 import requests
 import os
 URI = os.environ.get('URI')
-def test_rates_get_bad():
-    req = requests.get(URI + 'rates')
-    assert req.status_code == 404
-    if req.status_code == 404:
-        return 0
-    else:
-        return 1
 def test_rates_post_bad():
     req = requests.post(URI + 'rates?file=no_such_file.xlsx')
     assert req.status_code == 500

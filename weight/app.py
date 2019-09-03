@@ -1,21 +1,18 @@
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import datetime
-import csv
-
 from typing import Dict, List
-
 from classes import Connection
 from classes.Weight import Weight
+from classes.Item import Item
 from classes.Transaction import Transaction
-
+import os
 
 app = Flask(__name__)
-
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'weight-db',
+  'host': os.environ.get('MYSQL_HOST'),
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True
@@ -43,7 +40,17 @@ def health():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['POST'])
 def weight_post():
-    direction = request.form.get('direction')
+    if request.method == 'GET':
+            return render_template("weight-form.html")
+    elif request.method == 'POST':
+        id = request.form.get('id')
+        datetime = request.form.get('datetime')
+        direction = request.form.get('direction')
+        truck = request.form.get('truck')
+        containers = request.form.get('containers')
+        bruto = request.form.get('bruto')
+        truckTara = request.form.get('truckTara')
+        produce = request.form.get('produce')
     if Connection.Mysql.isHealth() == True : 
         return Weight.weight_post(direction)
     return "Error: DB Connection"
@@ -53,54 +60,12 @@ def weight_post():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['GET'])
 def weights_get():
-    try:
-        cnx = mysql.connector.connect(**config)
-    except mysql.connector.Error as err:
-        print(err)
-        return 'Failure', 500
+    if Connection.Mysql.isHealth() == True : 
+        return Weight.weights_get(request.args.get('from'),request.args.get('to'),request.args.get('filter'))
+    return "Error: DB Connection"
 
-    time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
 
-    if request.args.get('from')is None:
-        t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
-    else:
-        t1 = request.args.get('from')
     
-    if request.args.get('to')is None:
-        t2 = time_actual
-    else:
-        t2 = request.args.get('to')
-    f = []
-    if request.args.get('filter')is None:
-        f = ["in","out","none"]
-    else:
-        f = str(request.args.get('filter')).split(',')
-    
-    sql_select_Query = "select * from transactions where " + "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
-    cursor = cnx.cursor()
-    cursor.execute(sql_select_Query)
-    rows = cursor.fetchall()
-
-    list_of_transactions = []
-
-    for row in rows:
-        if row[2] in f:
-            if any(x in str(row[4]).split(',')  for x in unknown_weights()): #na if some of containers have unknown tara
-                neto = None
-            else:
-                neto = row[7]
-            transact = {
-                'id': row[0],
-                'direction': row[2],
-                'bruto': row[5],
-                'neto': neto,
-                'produce': row[8],
-                'containers': str(row[4]).split(',') 
-            }
-            list_of_transactions.append(transact)
-        
-    return jsonify({'transactions': list_of_transactions})
-
 # Author:
 # TODO Add Comments - Description
 @app.route('/unknown', methods=['GET'])
@@ -117,37 +82,15 @@ def batch_weight():
     if request.method == 'GET':
         return render_template("betch-weight.html")
     elif request.method == 'POST':
-        try:
-            fileName = request.form.get('file')
-            spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
-            ids=[]
-            weights=[]
-            for row in spamReader:
-                ids.append(row[0])
-                weights.append(row[1])
-                #print(row)
-            if str(weights[0]) == '"lbs"':
-                convert=True
-            else:
-                convert=False
-            weights.pop(0)
-            ids.pop(0)
-            if convert:
-                for i in range (len(weights)):
-                    weights[i] = str(int(0.453592*float(weights[i])))
-                    ids[i]='"' + ids[i] + '"'
-            for i in range(len(ids)):
-                #print("id:"+ids[i]+", weight: "+weights[i])
-                #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
-                query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
-                print(query)
-                Connection.Mysql.exec_query(query)
-                print(query)
-                return "OK"
+        if Connection.Mysql.isHealth() == True : 
 
-        except IOError as e: # TODO write to LOGFILE
-              print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
-              return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+            fileName = request.form.get('file')        
+            return Weight.batch_weight(fileName)
+
+        return "Error: DB Connection"
+        
+
+
 
 # Author:
 # TODO Add Comments - Description
@@ -191,21 +134,21 @@ def get_transaction():
 # Author:
 # TODO Add Comments - Description
 ## GET /item/<id>?from=t1&to=t2
-@app.route('/item', methods=['GET']) # TODO
-def get_item():
-    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1235123, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
-    rows = Connection.Mysql.exec_query(sql_select_Query)
-    return str(rows)
+@app.route('/item/<string:id_num>', methods=['GET']) # TODO
+def get_item(id_num):
+    if Connection.Mysql.isHealth() == True : 
+        return Item.get_items(request.args.get('from'),request.args.get('to'),id_num)
+    return "Error: DB Connection"
 
-# Author:
+
+# Author: 
 # TODO Add Comments - Description
 #   GET /session/<id>
-@app.route('/session', methods=['GET']) # TODO
-def get_session():
-    sql_select_Query = "select * from containers_registered"
-    rows = Connection.Mysql.exec_query(sql_select_Query)
-    return str(rows)
-
+@app.route('/session/<string:id_num>', methods=['GET']) # TODO
+def get_session(id_num):
+    if Connection.Mysql.isHealth() == True : 
+        return Transaction.get_session(id_num)
+    return "Error: DB Connection"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

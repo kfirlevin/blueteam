@@ -20,11 +20,12 @@ def sql(value):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
     try:
-        cursor.execute(f"INSERT INTO Provider (`name`) VALUES ('{value}')")
+        cursor.execute(f"INSERT INTO Provider (`nam`) VALUES ('{value}')")
         cursor.execute(f"SELECT id from Provider WHERE name='{value}' ")
         re=cursor.fetchall()
         cursor.close()
         connection.close()
+        logging.info(f"INSERT {value} INTO PROVIDER")
         return re
     except:
         logging.error(f"INSERT {value} IN TO PROVIDER FAILD!!!!!")
@@ -33,7 +34,6 @@ def sql(value):
 @app.route('/provider', methods=["POST"])
 def provider():
     value=request.args["provider_name"]
-    logging.info(f"INSERT {value} IN TO PROVIDER")
     hh=sql(value)
     if (hh != "ERROR"):
         v1=hh[0]

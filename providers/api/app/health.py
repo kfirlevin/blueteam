@@ -28,7 +28,8 @@ def health():
         cursor.close()
         connection.close()
         return 0
-    except:
+    except Exception as e:
+        logging.error(e)
         return 1
 
 

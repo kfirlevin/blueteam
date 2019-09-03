@@ -7,6 +7,8 @@ services:
       - '8085:5000'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - USER=${USER}
     # volumes:
     #   - ../../providers/:/providers
     #   - ../../weight/:/weight

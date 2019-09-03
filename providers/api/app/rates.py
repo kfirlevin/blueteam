@@ -8,7 +8,7 @@ import logging
 import sys
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-last_file_name = ''
+last_file_name = 'rates.xlsx'
 
 
 @app.route('/rates', methods=['GET', 'POST'])

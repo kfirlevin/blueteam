@@ -52,53 +52,11 @@ def weight_post():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['GET'])
 def weights_get():
-    try:
-        cnx = mysql.connector.connect(**config)
-    except mysql.connector.Error as err:
-        print(err)
-        return 'Failure', 500
+    if Connection.Mysql.isHealth() == True : 
+        return Weight.weights_get(request.args.get('from'),request.args.get('to'),request.args.get('filter'))
+    return "Error: DB Connection"
 
-    time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
-
-    if request.args.get('from')is None:
-        t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
-    else:
-        t1 = request.args.get('from')
     
-    if request.args.get('to')is None:
-        t2 = time_actual
-    else:
-        t2 = request.args.get('to')
-    f = []
-    if request.args.get('filter')is None:
-        f = ["in","out","none"]
-    else:
-        f = str(request.args.get('filter')).split(',')
-    
-    sql_select_Query = "select * from transactions where " + "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
-    cursor = cnx.cursor()
-    cursor.execute(sql_select_Query)
-    rows = cursor.fetchall()
-
-    list_of_transactions = []
-
-    for row in rows:
-        if row[2] in f:
-            if any(x in str(row[4]).split(',')  for x in unknown_weights()): #na if some of containers have unknown tara
-                neto = None
-            else:
-                neto = row[7]
-            transact = {
-                'id': row[0],
-                'direction': row[2],
-                'bruto': row[5],
-                'neto': neto,
-                'produce': row[8],
-                'containers': str(row[4]).split(',') 
-            }
-            list_of_transactions.append(transact)
-        
-    return jsonify({'transactions': list_of_transactions})
 
 # Author:
 # TODO Add Comments - Description
@@ -208,11 +166,12 @@ def get_transaction():
 # Author:
 # TODO Add Comments - Description
 ## GET /item/<id>?from=t1&to=t2
-@app.route('/item', methods=['GET']) # TODO
-def get_item():
-    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1235123, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
-    rows = Connection.Mysql.exec_query(sql_select_Query)
-    return str(rows)
+@app.route('/item/<string:id_num>', methods=['GET']) # TODO
+def get_item(id_num):
+    if Connection.Mysql.isHealth() == True : 
+        return Weight.get_items(request.args.get('from'),request.args.get('to'),id_num)
+    return "Error: DB Connection"
+    
 
 # Author:
 # TODO Add Comments - Description

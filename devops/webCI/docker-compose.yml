@@ -8,7 +8,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - USER_VOL=${USER}
+      - USER=ubuntu
     # volumes:
     #   - ../../providers/:/providers
     #   - ../../weight/:/weight

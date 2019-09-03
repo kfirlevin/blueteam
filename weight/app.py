@@ -93,16 +93,16 @@ def batch_weight():
         print(fileName)
         if fileName.endswith('.csv'):
             try:
-            spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
-            ids=[]
-            weights=[]
-            for row in spamReader:
-                ids.append(row[0])
-                weights.append(row[1])
-            if str(weights[0]) == '"lbs"':
-                convert=True
-            weights.pop(0)
-            ids.pop(0)
+                spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
+                ids=[]
+                weights=[]
+                for row in spamReader:
+                    ids.append(row[0])
+                    weights.append(row[1])
+                if str(weights[0]) == '"lbs"':
+                    convert=True
+                weights.pop(0)
+                ids.pop(0)
             except IOError as e: # TODO write to LOGFILE
                 print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
                 return ('I/O error({0}): {1}'.format(e.errno, e.strerror))

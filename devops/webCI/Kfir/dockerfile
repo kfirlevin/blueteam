@@ -2,5 +2,9 @@ FROM docker/compose:1.25.0-rc2-debian
 RUN apt-get update
 RUN apt-get install git -y
 RUN git clone https://github.com/tomikonio/blueteam.git
-
-ENTRYPOINT docker-compose up  -f /blueteam/devops/docker-prod/docker-compose.yml --build -d
+RUN apt-get install python -y
+RUN apt-get install python-pip -y
+RUN pip install flask subprocess.run
+COPY . /app
+WORKDIR /app
+ENTRYPOINT flask run --host=0.0.0.0

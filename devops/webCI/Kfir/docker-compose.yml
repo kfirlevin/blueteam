@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  cisrv:
+    build: .
+    ports:
+      - '8085:5000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

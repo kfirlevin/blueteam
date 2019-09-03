@@ -4,15 +4,24 @@ test_names=( docker-test_providers-db docker-test_providers-server docker-test_w
 
 pushd .
 cd /blueteam/devops/docker-test
-docker-compose up --build
-sleep 30
+docker-compose up --build -d
 
 ## Testing
-docker-compose down
-for name in ${test_names[@]}
-do
-    docker rmi $name -f
-done 
+status=$(python3 health)
+if [ $status == "True"]
+then
+    docker-compose down
+    for name in ${test_names[@]}
+    do
+        docker rmi $name -f
+    done
 
+    cd /blueteam/devops/docker-prod
+    docker-compose down
+    for name in ${prod_names[@]}
+    do
+        docker rmi $name -f
+    done
+    docker-compose up --build -d
 
 popd

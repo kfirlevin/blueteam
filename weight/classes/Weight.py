@@ -1,5 +1,5 @@
 from classes import Connection
-from flask import  jsonify
+from flask import  jsonify, abort
 import datetime
 
 class Weight():
@@ -13,12 +13,16 @@ class Weight():
            abort(404)
         if time_from is None:
             t1 = datetime.datetime.now().strftime("%Y%m"+"01000000")
-        else:
+        elif str(time_from).isdigit():
             t1 = time_from
+        else:
+            abort(404)
         if time_to is None:
             t2 = time_actual
-        else:
+        elif str(time_to).isdigit():
             t2 = time_to
+        else:
+            abort(404)
         
         list_of_session = []
         tara = None
@@ -47,7 +51,7 @@ class Weight():
 
         sql_select_Query = "select * from transactions where " + "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
         rows =  Connection.Mysql.exec_query(sql_select_Query)
-        
+
         for row in rows:
             if id_num in str(row[4]).split(','):
                 list_of_session.append(row[0])
@@ -69,13 +73,16 @@ class Weight():
 
         if time_from is None:
             t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
-        else:
+        elif str(time_from).isdigit():
             t1 = time_from
-    
+        else:
+            abort(404)
         if time_to is None:
             t2 = time_actual
-        else:
+        elif str(time_to).isdigit():
             t2 = time_to
+        else:
+            abort(404)
         f = []
         if filter is None:
            f = ["in","out","none"]
@@ -83,15 +90,13 @@ class Weight():
             f = str(filter).split(',')
     
         sql_select_Query = "select * from transactions where " + "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
-        cursor = cnx.cursor()
-        cursor.execute(sql_select_Query)
-        rows = cursor.fetchall()
+        rows =  Connection.Mysql.exec_query(sql_select_Query)
 
         list_of_transactions = []
 
         for row in rows:
             if row[2] in f:
-                if any(x in str(row[4]).split(',')  for x in unknown_weights()): #na if some of containers have unknown tara
+                if any(x in str(row[4]).split(',') for x in Weight.unknown_weights()): #na if some of containers have unknown tara
                     neto = None
                 else:
                     neto = row[7]

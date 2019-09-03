@@ -13,9 +13,11 @@ services:
       - '8080:5000'
     environment:
       - DB_HOST="prov-db-test"
+    volumes:
+      - ~/test-prov_rates/:/in/
 
   weight-db:
-    container_name: mysql
+    container_name: weight-db-test
     build: ../../weight/Mysql-db/
     volumes:
       - ~/test-dbs/weight-data/:/var/lib/mysql
@@ -24,3 +26,5 @@ services:
     build: ../../weight/
     ports:
       - '8090:5000'
+    environment:
+      - DB_HOST="weight-db-test"

@@ -6,6 +6,7 @@ import json
 from typing import Dict, List
 from classes import Connection
 from classes.Weight import Weight
+from classes.Item import Item
 from classes.Transaction import Transaction
 
 
@@ -169,7 +170,7 @@ def get_transaction():
 @app.route('/item/<string:id_num>', methods=['GET']) # TODO
 def get_item(id_num):
     if Connection.Mysql.isHealth() == True : 
-        return Weight.get_items(request.args.get('from'),request.args.get('to'),id_num)
+        return Item.get_items(request.args.get('from'),request.args.get('to'),id_num)
     return "Error: DB Connection"
     
 

@@ -1,0 +1,42 @@
+********** Starting test: *****[time:2019-09-03 13:54:12.382081] **********
+500 Server Error: INTERNAL SERVER ERROR for url: http://blue.develeap.com:8090/health
+http://blue.develeap.com:8080/health test sccess!
+Health error 
+
+******************** Finished testing ********************
+
+********** Starting test: *****[time:2019-09-03 14:15:53.284746] **********
+500 Server Error: INTERNAL SERVER ERROR for url: http://blue.develeap.com:8090/health
+http://b******* Starting tee.develeap.com:8080/health test sccess!
+Health e******* Starting teor 
+
+*************** Starting te********** Finished testing ********************
+
+********** Starting test: *****[time:2019-09-03 14:16:49.585845] **********
+500 Server Error: INTERNAL SERVER ERROR for url: http://blue.develeap.com:8090/health
+http://blue.develeap.com:8080/health test sccess!
+Health error 
+
+******************** Finished testing ********************
+
+********** Starting test: *****[time:2019-09-03 14:19:12.271951] **********
+500 Server Error: INTERNAL SERVER ERROR for url: http://blue.develeap.com:8090/health
+http://blue.develeap.com:8080/health test sccess!
+Health error 
+
+******************** Finished testing ********************
+
+********** Starting test: ***** time:2019-09-03 14:21:55.781377 **********
+500 Server Error: INTERNAL SERVER ERROR for url: http://blue.develeap.com:8090/health
+http://blue.develeap.com:8080/health test sccess!
+Health error 
+
+******************** The test is over ********************
+
+********** Starting test: ***** time:2019-09-03 14:36:13.080380 **********
+500 Server Error: INTERNAL SERVER ERROR for url: http://blue.develeap.com:8090/health
+http://blue.develeap.com:8080/health test sccess!
+Health error 
+
+******************** The test is over ********************
+

@@ -1,21 +1,18 @@
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import datetime
-import csv
-import json
 from typing import Dict, List
 from classes import Connection
 from classes.Weight import Weight
 from classes.Item import Item
 from classes.Transaction import Transaction
-
+import os
 
 app = Flask(__name__)
-
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'weight-db',
+  'host': os.environ.get('MYSQL_HOST'),
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True
@@ -85,53 +82,13 @@ def batch_weight():
     if request.method == 'GET':
         return render_template("betch-weight.html")
     elif request.method == 'POST':
-        ids=[]
-        weights=[]
-        convert=False
-        fileName = request.form.get('file')
-        print(type(fileName))
-        print(fileName)
-        if fileName.endswith('.csv'):
-            try:
-                spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
-                ids=[]
-                weights=[]
-                for row in spamReader:
-                    ids.append(row[0])
-                    weights.append(row[1])
-                if str(weights[0]) == '"lbs"':
-                    convert=True
-                weights.pop(0)
-                ids.pop(0)
-            except IOError as e: # TODO write to LOGFILE
-                print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+        if Connection.Mysql.isHealth() == True : 
 
-        elif fileName.endswith('.json'):
-            try:
-                with open('./in/'+fileName) as json_file:
-                    data=json.loads(json_file.read())
-                if data[1]["unit"]=='lbs':
-                    convert = True
-                for truck in data:
-                    ids.append(truck["id"])
-                    weights.append(truck["weight"])
-            except IOError as e: # TODO write to LOGFILE
-                print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
-              
-            if convert:
-                for i in range (len(weights)):
-                    weights[i] = str(int(0.453592*float(weights[i])))
-                    ids[i]='"' + ids[i] + '"'
-            for i in range(len(ids)):
-                #print("id:"+ids[i]+", weight: "+weights[i])
-                #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
-                query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
-                print(query)
-                Connection.Mysql.exec_query(query)
-                print(query)
-                return "OK"
+            fileName = request.form.get('file')        
+            return Weight.batch_weight(fileName)
+
+        return "Error: DB Connection"
+        
 
 
 
@@ -184,7 +141,7 @@ def get_item(id_num):
     return "Error: DB Connection"
 
 
-# Author:
+# Author: 
 # TODO Add Comments - Description
 #   GET /session/<id>
 @app.route('/session/<string:id_num>', methods=['GET']) # TODO

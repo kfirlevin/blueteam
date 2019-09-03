@@ -22,7 +22,7 @@ class Transaction():
         time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
 
 
-        if id_num is None:
+        if not str(id_num).isdigit():
            abort(404)
         
         list_of_session = []
@@ -52,6 +52,6 @@ class Transaction():
                     'truck': rows[0][3],
                     'bruto': rows[0][5]
             }
-        return jsonify({'item': session})
+        return jsonify({'session': session})
 
 

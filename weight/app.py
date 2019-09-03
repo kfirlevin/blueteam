@@ -2,9 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import datetime
 import csv
-
+import json
 from typing import Dict, List
-
 from classes import Connection
 from classes.Weight import Weight
 from classes.Transaction import Transaction
@@ -48,7 +47,7 @@ def weight_post():
     elif request.method == 'POST':
         id = request.form.get('id')
         datetime = request.form.get('datetime')
-        direction = request.form.get('direction')
+    direction = request.form.get('direction')
         truck = request.form.get('truck')
         containers = request.form.get('containers')
         bruto = request.form.get('bruto')
@@ -63,54 +62,12 @@ def weight_post():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['GET'])
 def weights_get():
-    try:
-        cnx = mysql.connector.connect(**config)
-    except mysql.connector.Error as err:
-        print(err)
-        return 'Failure', 500
+    if Connection.Mysql.isHealth() == True : 
+        return Weight.weights_get(request.args.get('from'),request.args.get('to'),request.args.get('filter'))
+    return "Error: DB Connection"
 
-    time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
 
-    if request.args.get('from')is None:
-        t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
-    else:
-        t1 = request.args.get('from')
     
-    if request.args.get('to')is None:
-        t2 = time_actual
-    else:
-        t2 = request.args.get('to')
-    f = []
-    if request.args.get('filter')is None:
-        f = ["in","out","none"]
-    else:
-        f = str(request.args.get('filter')).split(',')
-    
-    sql_select_Query = "select * from transactions where " + "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
-    cursor = cnx.cursor()
-    cursor.execute(sql_select_Query)
-    rows = cursor.fetchall()
-
-    list_of_transactions = []
-
-    for row in rows:
-        if row[2] in f:
-            if any(x in str(row[4]).split(',')  for x in unknown_weights()): #na if some of containers have unknown tara
-                neto = None
-            else:
-                neto = row[7]
-            transact = {
-                'id': row[0],
-                'direction': row[2],
-                'bruto': row[5],
-                'neto': neto,
-                'produce': row[8],
-                'containers': str(row[4]).split(',') 
-            }
-            list_of_transactions.append(transact)
-        
-    return jsonify({'transactions': list_of_transactions})
-
 # Author:
 # TODO Add Comments - Description
 @app.route('/unknown', methods=['GET'])
@@ -127,21 +84,41 @@ def batch_weight():
     if request.method == 'GET':
         return render_template("betch-weight.html")
     elif request.method == 'POST':
-        try:
+        ids=[]
+        weights=[]
+        convert=False
             fileName = request.form.get('file')
+        print(type(fileName))
+        print(fileName)
+        if fileName.endswith('.csv'):
+            try:
             spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
             ids=[]
             weights=[]
             for row in spamReader:
                 ids.append(row[0])
                 weights.append(row[1])
-                #print(row)
             if str(weights[0]) == '"lbs"':
                 convert=True
-            else:
-                convert=False
             weights.pop(0)
             ids.pop(0)
+            except IOError as e: # TODO write to LOGFILE
+                print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+
+        elif fileName.endswith('.json'):
+            try:
+                with open('./in/'+fileName) as json_file:
+                    data=json.loads(json_file.read())
+                if data[1]["unit"]=='lbs':
+                    convert = True
+                for truck in data:
+                    ids.append(truck["id"])
+                    weights.append(truck["weight"])
+            except IOError as e: # TODO write to LOGFILE
+                print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+              
             if convert:
                 for i in range (len(weights)):
                     weights[i] = str(int(0.453592*float(weights[i])))
@@ -155,9 +132,7 @@ def batch_weight():
                 print(query)
                 return "OK"
 
-        except IOError as e: # TODO write to LOGFILE
-              print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
-              return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+
 
 # Author:
 # TODO Add Comments - Description
@@ -206,15 +181,21 @@ def get_item():
     sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
     rows = Connection.Mysql.exec_query(sql_select_Query)
     return str(rows)
+@app.route('/item', methods=['GET']) # TODO
+def get_item():
+    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1235123, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
+    rows = Connection.Mysql.exec_query(sql_select_Query)
+    return str(rows)
+@app.route('/item/<string:id_num>', methods=['GET']) # TODO
+def get_item(id_num):
+    if Connection.Mysql.isHealth() == True : 
+        return Weight.get_items(request.args.get('from'),request.args.get('to'),id_num)
+    return "Error: DB Connection"
+
 
 # Author:
 # TODO Add Comments - Description
 #   GET /session/<id>
-@app.route('/session/<id>', methods=['GET']) # TODO
-def get_session(id):
-    sql_select_Query = "select * from transactions where " + "id ='" + str(id)  + "'"
-    row = Connection.Mysql.exec_query(sql_select_Query)
-    return jsonify(Transaction.transactionToJson(row[0]))
 
 
 if __name__ == '__main__':

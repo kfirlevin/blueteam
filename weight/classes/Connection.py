@@ -22,8 +22,7 @@ class Mysql(object):
             rows = cursor.fetchall()
         except mysql.connector.Error as err:
             print(err)
-            cnx.close()
-            return 'Failure', 500
+            return 'Failure', 500 , err
         cnx.close()
         return rows
     
@@ -44,7 +43,7 @@ class Mysql(object):
             return False
         cnx.close()
         return True
-    
+       
 
 
 

@@ -7,6 +7,7 @@ from typing import Dict, List
 
 from classes import Connection
 from classes.Weight import Weight
+from classes.Transaction import Transaction
 
 
 app = Flask(__name__)
@@ -167,17 +168,32 @@ def get_weight():
             "unit": row[2]
             }
          )
+    return jsonify(list_of_unknown)
 
 
-    return str(list_of_unknown)
+# Author:
+# TODO Add Comments - Description
+#GET /weight?from=t1&to=t2&filter=f
+@app.route('/all_transactions', methods=['GET'])
+def get_transaction():
 
+    sql_select_Query = """select * from transactions"""
+    rows = Connection.Mysql.exec_query(sql_select_Query)
+
+    list_of_unknown = []
+
+    for row in rows:
+         list_of_unknown.append(
+             Transaction.transactionToJson(row)
+         )
+    return jsonify(list_of_unknown)
 
 # Author:
 # TODO Add Comments - Description
 ## GET /item/<id>?from=t1&to=t2
 @app.route('/item', methods=['GET']) # TODO
 def get_item():
-    sql_select_Query = "select * from containers_registered"
+    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1235123, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
     rows = Connection.Mysql.exec_query(sql_select_Query)
     return str(rows)
 
@@ -189,9 +205,6 @@ def get_session():
     sql_select_Query = "select * from containers_registered"
     rows = Connection.Mysql.exec_query(sql_select_Query)
     return str(rows)
-
-
-
 
 
 if __name__ == '__main__':

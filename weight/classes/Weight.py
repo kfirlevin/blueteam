@@ -2,7 +2,7 @@ from classes import Connection
 from flask import  jsonify
 
 class Weight():
-
+    
 
     def weight_post(direction):
         if direction in ['in', 'out', 'none']:

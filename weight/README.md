@@ -26,8 +26,8 @@ Weight
 - [x] GET /health
 
 - [ ] POST /batch-weight  (called by admin) - TODO
-    - upload file function
-    - convert json to csv function
+    - Open file 
+    - convert json to csv function - unic type CSV 
     - reading csv file to list objects 
     - add object to database 
     - implement API use functions  
@@ -35,11 +35,11 @@ Weight
     
 - [ ] Test - POST /batch-weight - TODO 
     - testing api
-    - testing upload
-    - testing add object to db 
-    - convert json to csv
+    - testing file (not found / empty)
+    - testing add object to db  (no connection / query errors)
+    - convert json to csv (check function)
     
-- [ ] GET /weight?from=t1&to=t2&filter=f (report by time) -  TODO 
+- [ ] GET /weight?from=t1&to=t2&filter=f (report by time) -  # DONE - <MOSHI> 
     - - format date
     - insert query & execute it in def func(from,to,filter)
         - default from - day in week
@@ -48,7 +48,7 @@ Weight
     - execute query and convert data result to json 
     
     
-- [ ] GET/unknown (called by admin) - TODO
+- [ ] GET/unknown (called by admin) - # DONE - <MOSHI>
     - select where weigth unknown - query 
     - func exec query
     - return json result
@@ -56,9 +56,17 @@ Weight
     
     
 - [ ] GET/ item/<id> (truck/container report) 
-- [ ] GET /session/<id> (weighing report) 
-- [ ] POST /weight (called by new weight)
+    - id is for an item (truck or container)
+    - 
 
+
+- [ ] GET /session/<id> (weighing report)   # TODO 
+    - Create Session repo (table)
+    - write function addSession()
+    - GetSessionById()
+    - 
+- [ ] POST /weight (called by new weight) # TODO 
+    - 
 
 ![d964392a6d44b5206c153b302c853c7f.png](:/22b85180b5b2493abdea0d2756eea7cf)
 

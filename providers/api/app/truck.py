@@ -85,6 +85,18 @@ def handleTruck():
         return json.dumps(res,sort_keys=True,indent=4)
 
 
+@app.route('/truck/<id>',methods=['GET'])
+def handleTruckGet(id):
+    if request.method == 'GET':
+        From=request.args.get('from')
+        To=request.args.get('to')
+        jsonMOCK = {
+            "id" : 123,
+            "tara" : 2000,
+            "sessions" : [1,2,3,4,5]
+        }
+        return jsonMOCK
+        
 # @app.route('/truck/<id>',methods=['GET'])
 # def handleTruckGet(id):
 #     if request.method == 'GET':

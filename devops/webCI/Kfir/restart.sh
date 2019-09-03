@@ -4,6 +4,6 @@ cd /blueteam/devops/docker-test
 docker-compose up --build -d
 
 ## Testing 
-status=$(python)
+#status=$(python)
 
 popd

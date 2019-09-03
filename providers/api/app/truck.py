@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from typing import List, Dict
 import mysql.connector
 import json
+import requests
 import os
 from . import db
 import logging
@@ -23,9 +24,13 @@ def truckPost(truckId,providerId):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
     query = "INSERT INTO Trucks (id,provider_id) VALUES (%s, %s);"
-    cursor.execute(query, (truckId, providerId))
-    connection.commit()
-    logging.info(query,(truckId, providerId))
+    try:
+        cursor.execute(query, (truckId, providerId))
+        connection.commit()
+        logging.info(query,(truckId, providerId))
+    except Exception as e:
+        logging.error(e)
+        return 'error ' + str(e)
     cursor.execute('select * from Trucks')
     results = cursor.fetchall()
     dictionary = {}
@@ -36,13 +41,22 @@ def truckPost(truckId,providerId):
     return dictionary
 
 
+
 def truckPut(truckId,providerId):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
     query = "UPDATE Trucks SET provider_id = (select id from Provider where name = %s) where id = %s ;"
-    cursor.execute(query, (providerId, truckId))
-    connection.commit()
-    logging.info(query,(truckId, providerId))
+
+    try:
+        cursor.execute(query, (providerId, truckId))
+        connection.commit()
+        logging.info(query, (providerId, truckId))
+    except Exception as e:
+        logging.error(e)
+        return 'error ' + str(e)
+    # cursor.execute(query, (providerId, truckId))
+    # connection.commit()
+    # logging.info(query,(truckId, providerId))
     cursor.execute('select * from Trucks where id = %s ;',(truckId,))
     results = cursor.fetchall()
     dictionary = {}
@@ -57,10 +71,38 @@ def handleTruck():
     if request.method == 'POST':
         trcukId=request.args.get('id')
         providerId=request.args.get('provider')
-        #res = truckPost(trcukId,providerId)
-        return json.dumps(truckPost(trcukId,providerId),sort_keys=True,indent=4)
+        res = truckPost(trcukId,providerId)
+        if 'error' in str(res):
+            return str(res),500
+        return json.dumps(res,sort_keys=True,indent=4)
     
     if request.method == 'PUT':
         trcukId=request.args.get('id')
         providerId=request.args.get('provider')
-        return json.dumps(truckPut(trcukId,providerId),sort_keys=True,indent=4)
+        res = truckPut(trcukId,providerId)
+        if 'error' in str(res):
+            return str(res),500
+        return json.dumps(res,sort_keys=True,indent=4)
+
+
+@app.route('/truck/<id>',methods=['GET'])
+def handleTruckGet(id):
+    if request.method == 'GET':
+        From=request.args.get('from')
+        To=request.args.get('to')
+        jsonMOCK = {
+            "id" : 123,
+            "tara" : 2000,
+            "sessions" : [1,2,3,4,5]
+        }
+        return jsonMOCK
+        
+# @app.route('/truck/<id>',methods=['GET'])
+# def handleTruckGet(id):
+#     if request.method == 'GET':
+#         From=request.args.get('from')
+#         To=request.args.get('to')
+#         weightjson = requests.get('http://blue.develeap.com:8090/item/{id}?from={From}&to={To}')
+#         return requests.get('http://localhost:5000/test').content
+        
+

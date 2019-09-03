@@ -48,7 +48,7 @@ def weight_post():
     elif request.method == 'POST':
         id = request.form.get('id')
         datetime = request.form.get('datetime')
-    direction = request.form.get('direction')
+        direction = request.form.get('direction')
         truck = request.form.get('truck')
         containers = request.form.get('containers')
         bruto = request.form.get('bruto')
@@ -88,7 +88,7 @@ def batch_weight():
         ids=[]
         weights=[]
         convert=False
-            fileName = request.form.get('file')
+        fileName = request.form.get('file')
         print(type(fileName))
         print(fileName)
         if fileName.endswith('.csv'):
@@ -177,16 +177,6 @@ def get_transaction():
 # Author:
 # TODO Add Comments - Description
 ## GET /item/<id>?from=t1&to=t2
-@app.route('/item', methods=['GET']) # TODO
-def get_item():
-    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
-    rows = Connection.Mysql.exec_query(sql_select_Query)
-    return str(rows)
-@app.route('/item', methods=['GET']) # TODO
-def get_item():
-    sql_select_Query = "INSERT INTO `transactions` (`id`, `datetime`, `direction`, `truck`, `containers`, `bruto`, `truckTara`, `neto`, `produce`) VALUE ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (1235123, 20010101010101 , "direction" , "truck" , "Containers" , 1200 , 1000 , 200 , "produce");
-    rows = Connection.Mysql.exec_query(sql_select_Query)
-    return str(rows)
 @app.route('/item/<string:id_num>', methods=['GET']) # TODO
 def get_item(id_num):
     if Connection.Mysql.isHealth() == True : 
@@ -197,7 +187,11 @@ def get_item(id_num):
 # Author:
 # TODO Add Comments - Description
 #   GET /session/<id>
-
+@app.route('/session/<string:id_num>', methods=['GET']) # TODO
+def get_session(id_num):
+    if Connection.Mysql.isHealth() == True : 
+        return Transaction.get_session(id_num)
+    return "Error: DB Connection"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

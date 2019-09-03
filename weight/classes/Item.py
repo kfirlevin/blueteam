@@ -37,9 +37,12 @@ class Item():
             if not rows:
                 abort(404)
             for row in rows:
+                if tara is None or row[6] is not None:
+                    tara = row[6]
                 list_of_session.append(row[0])
-                tara = row[6]
 
+            if tara is None:
+                tara = "na"
             item = {
                     'id': id_num,
                     'tara': tara,

@@ -35,7 +35,7 @@ class Weight():
         for row in rows:
             if row[2] in f:
                 if any(x in str(row[4]).split(',') for x in Weight.unknown_weights()): #na if some of containers have unknown tara
-                    neto = None
+                    neto = "na"
                 else:
                     neto = row[7]
                 transact = {

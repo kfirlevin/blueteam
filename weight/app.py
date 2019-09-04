@@ -10,6 +10,7 @@ import os
 import logging
 
 app = Flask(__name__)
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 config = {
   'user': 'db',
   'password': 'password',
@@ -43,6 +44,7 @@ def health():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['POST'])
 def weight_post():
+    
     if request.method == 'GET':
             return render_template("weight-form.html")
     elif request.method == 'POST':
@@ -50,32 +52,45 @@ def weight_post():
         direction = request.form.get('direction')
         if direction not in ("out", "in", "none"):
             return 'Not a valid direction', 400
-        if direction == 'none':
-            direction = 'in'
-        truck = request.form.get('truck')
-        if truck is None:
+        truckId = request.form.get('truck')
+        if truckId is None:
             return 'No truck id?', 400
-        currentTime = datetime.datetime.now()
-        containers = request.form.get('containers').split(',')
+        time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
+        containers = request.form.get('containers')
         if containers is None:
             return 'There are no containers?', 400
-        weight = request.form.get('weight')
-        if weight is None:
+        bruto = request.form.get('bruto')
+        if bruto is None:
             return 'You forgot to enter weight', 400
-        unit = request.form.get('unit')
-        if unit not in ("kg", "lbs"):
-            return 'unit not supported', 400
-        if unit == 'lbs':
-            weight = int(0.453592*float(weight))
-            unit = 'kg'
         produce = request.form.get('produce')
         if produce not in ("tomato", "orange"):
             return 'Not a valid produce', 400
         if request.form.get('fouce') == 'true':
             force = True
-        print(weight)
-        return(weight , produce ) , 200
-        #return(), 200
+        #return "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+        data=Weight.last_action(truckId)
+        if direction is in ("in", "none"):
+            if data == "not found" or data[2] == 'out'
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                Connection.Mysql.exec_query(query)
+            elif data[2] == 'in':
+                if force:
+                    pass
+                else:
+                    pass
+        else:
+            if data == "not found":
+                abort(404)
+            if data[2] == 'in'
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                Connection.Mysql.exec_query(query)
+            elif data[2] == 'in':
+                if force:
+                    pass
+                else:
+                    pass
+
+        return("good"), 200
 
     if Connection.Mysql.isHealth() == True:
         return Weight.weight_post(direction)

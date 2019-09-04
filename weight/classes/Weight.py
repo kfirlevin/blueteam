@@ -54,11 +54,6 @@ class Weight():
 
         return jsonify({'transactions': list_of_transactions})
 
-    def weight_post(direction):
-        if direction in ['in', 'out', 'none']:
-            return "We're good", 200
-        else:
-            return 'Not a valid direction', 400
 
     def unknown_weights():
         list_of_unknown = []
@@ -136,10 +131,10 @@ class Weight():
             abort(404)
         return str(rows[0][1])
 
-    def check_direction(id_num):
+    def last_action(id_num):
         sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " order by datetime desc limit 1" 
         rows = Connection.Mysql.exec_query(sql_select_Query)
-        if not rows:
-            abort(404)
+        if not rows or rows[0][2] == "none":
+            return "not found"
             
         return rows[0]

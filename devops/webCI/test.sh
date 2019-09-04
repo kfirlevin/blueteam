@@ -17,20 +17,21 @@ then
         docker rmi $name -f
     done
 
-    # cd /blueteam/devops/docker-prod
-    # docker-compose down
-    # for name in ${prod_names[@]}
-    # do
-    #     docker rmi $name -f
-    # done
-    # docker-compose up --build -d
-# else
-#     docker-compose down
-#     for name in ${test_names[@]}
-#     do
-#         docker rmi $name -f
-#     done
+    cd /blueteam/devops/docker-prod
+    docker-compose down
+    for name in ${prod_names[@]}
+    do
+        docker rmi $name -f
+    done
+    docker-compose up --build -d
+else
+    docker-compose down
+    for name in ${test_names[@]}
+    do
+        docker rmi $name -f
+    done
 fi
+docker volume prune -f
 docker images -qf dangling=true | xargs docker rmi
 
 popd

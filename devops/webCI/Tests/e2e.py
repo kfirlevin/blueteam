@@ -12,7 +12,7 @@ def testresult(providers, weight):
 
 
 providers = os.system(
-    'export URI=http://blue.develeap.com:8081/ && pytest ../../../providers > providers.txt')
+    'export URI=http://blue.develeap.com:8081/ && pytest ../../providers > providers.txt')
 weight = os.system(
-    'export URI=http://blue.develeap.com:8082/ && pytest ../../../weight > weight.txt')
+    'export URI=http://blue.develeap.com:8082/ && pytest ../../weight > weight.txt')
 print(testresult(providers, weight))

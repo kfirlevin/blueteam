@@ -83,14 +83,14 @@ def weight_post():
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 result = Connection.Mysql.exec_query(query)
                 logging.warning("this result {}".format(str(result)))
-                return Transaction.transactionToJson(result)
+                return "INSERT"
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
                     result =Connection.Mysql.exec_query(query)
          
                     logging.warning("this result {}".format(str(result)))
-                    return Transaction.transactionToJson(result)
+                    return "UPDATE"
                 else:
                     return "error: The truck entered the factory but never left"
         elif direction == "out":

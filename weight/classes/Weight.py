@@ -150,3 +150,12 @@ class Weight():
             return "not found"
             
         return rows[0]
+
+    def all_containers_here(containers_list):
+        for id_num in containers_list:
+            sql_select_Query = "select * from containers_registered where container_id=" + "'" + id_num + "'"
+            rows = Connection.Mysql.exec_query(sql_select_Query)
+            if not rows:
+                return False
+
+        return True

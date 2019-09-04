@@ -1,8 +1,9 @@
 import requests
 import pytest
+import os
 
 
-URI = "http://blue.develeap.com:8090"
+URI = os.environ.get('URI') #"http://blue.develeap.com:8090"
 
 
 def test_get_item():

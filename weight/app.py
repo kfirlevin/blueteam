@@ -71,7 +71,7 @@ def weight_post():
         data=Weight.last_action(truckId)
         if direction == "in":
             if data == "not found" or data[2] == 'out':
-                query="UPDATE transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 Connection.Mysql.exec_query(query)
             elif data[2] == 'in':
                 if force:

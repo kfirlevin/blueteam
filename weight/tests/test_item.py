@@ -1,8 +1,7 @@
 import requests
-import pytest
+import os
 
-
-URI = "http://blue.develeap.com:8090"
+URI = os.environ.get('URI')
 
 def test_get_item():
     response = requests.get(URI + "/item/T-123523?from=19990101010101")

@@ -69,8 +69,8 @@ def weight_post():
             force = True
         #return "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
         data=Weight.last_action(truckId)
-        '''if direction in ["in", "none"]:
-            if data == "not found" or data[2] == 'out'
+        if direction in ["in", "none"]:
+            if data == "not found" or data[2] == 'out':
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 Connection.Mysql.exec_query(query)
             elif data[2] == 'in':
@@ -81,14 +81,15 @@ def weight_post():
         else:
             if data == "not found":
                 abort(404)
-            if data[2] == 'in'
-                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
-                Connection.Mysql.exec_query(query)
+            if data[2] == 'in':
+                pass
+                #query="UPDATE transactions SET
+                #Connection.Mysql.exec_query(query)
             elif data[2] == 'in':
                 if force:
                     pass
                 else:
-                    pass'''
+                    pass
 
         return("good"), 200
 

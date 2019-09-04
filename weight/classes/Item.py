@@ -13,13 +13,13 @@ class Item():
             abort(404)
         if time_from is None:
             t1 = datetime.datetime.now().strftime("%Y%m"+"01000000")
-        elif str(time_from).isdigit():
+        elif Weight.validate(str(time_from)):
             t1 = time_from
         else:
             abort(404)
         if time_to is None:
             t2 = time_actual
-        elif str(time_to).isdigit():
+        elif Weight.validate(str(time_to)):
             t2 = time_to
         else:
             abort(404)
@@ -56,6 +56,8 @@ class Item():
         sql_select_Query = "select * from transactions where " + \
             "datetime>='" + str(t1) + "' and datetime<='" + str(t2) + "'"
         rows = Connection.Mysql.exec_query(sql_select_Query)
+        if not rows:
+            abort(404)
 
         for row in rows:
             if id_num in str(row[4]).split(','):

@@ -7,8 +7,10 @@ from classes.Weight import Weight
 from classes.Item import Item
 from classes.Transaction import Transaction
 import os
+import logging
 
 app = Flask(__name__)
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 config = {
   'user': 'db',
   'password': 'password',
@@ -27,6 +29,8 @@ config = {
 # TODO Add Comments - Description
 @app.route('/')
 def index():
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.warning('is when this event was logged.')
     return render_template("index.html")
 
 
@@ -40,6 +44,7 @@ def health():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['POST'])
 def weight_post():
+    
     if request.method == 'GET':
             return render_template("weight-form.html")
     elif request.method == 'POST':
@@ -47,29 +52,48 @@ def weight_post():
         direction = request.form.get('direction')
         if direction not in ("out", "in", "none"):
             return 'Not a valid direction', 400
-        if direction == 'none':
-            direction = 'in'
-        truck = request.form.get('truck')
-        if truck is None:
+        truckId = request.form.get('truck')
+        if truckId is None:
             return 'No truck id?', 400
-        datetime = datetime.datetime.now()
-        containers = request.form.get('containers').split(',')
+        time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
+        containers = request.form.get('containers')
         if containers is None:
             return 'There are no containers?', 400
-        weight = request.form.get('weight')
-        if weight is None:
+        bruto = request.form.get('bruto')
+        if bruto is None:
             return 'You forgot to enter weight', 400
-        unit = request.form.get('unit')
-        if unit not in ("kg", "lbs"):
-            return 'unit not supported', 400
-        if unit == 'lbs':
-            weight = int(0.453592*float(weight))
-            unit = 'kg'
         produce = request.form.get('produce')
         if produce not in ("tomato", "orange"):
             return 'Not a valid produce', 400
         if request.form.get('fouce') == 'true':
             force = True
+        #return "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+        data=Weight.last_action(truckId)
+        if direction == "in":
+            if data == "not found" or data[2] == 'out':
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                Connection.Mysql.exec_query(query)
+            elif data[2] == 'in':
+                if force:
+                    pass
+                else:
+                    pass
+        elif direction == "out":
+            if data == "not found":
+                abort(404)
+            if data[2] == 'in':
+                pass
+                #query="UPDATE transactions SET
+                #Connection.Mysql.exec_query(query)
+            elif data[2] == 'in':
+                if force:
+                    pass
+                else:
+                    pass
+        else:
+            pass
+
+        return("good"), 200
 
     if Connection.Mysql.isHealth() == True:
         return Weight.weight_post(direction)
@@ -165,6 +189,12 @@ def get_item(id_num):
 def get_session(id_num):
     if Connection.Mysql.isHealth() == True:
         return Transaction.get_session(id_num)
+    return "Error: DB Connection"
+
+@app.route('/container_weight/<string:id_num>', methods=['GET'])  # TODO
+def container_weight(id_num):
+    if Connection.Mysql.isHealth() == True:
+        return Weight.last_action(id_num,True)
     return "Error: DB Connection"
 
 

@@ -3,9 +3,17 @@ from flask import jsonify, abort
 import datetime
 import csv
 import json
+import logging
 
 
 class Weight():
+
+    def validate(date_text):
+        try:
+            datetime.datetime.strptime(date_text, '%Y%m%d%I%M%S')
+        except ValueError:
+            return 0
+        return 1
 
     def weights_get(time_from, time_to, filter):
 
@@ -13,13 +21,13 @@ class Weight():
 
         if time_from is None:
             t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
-        elif str(time_from).isdigit():
+        elif Weight.validate(str(time_from)):
             t1 = time_from
         else:
             abort(404)
         if time_to is None:
             t2 = time_actual
-        elif str(time_to).isdigit():
+        elif Weight.validate(str(time_to)):
             t2 = time_to
         else:
             abort(404)
@@ -54,11 +62,6 @@ class Weight():
 
         return jsonify({'transactions': list_of_transactions})
 
-    def weight_post(direction):
-        if direction in ['in', 'out', 'none']:
-            return "We're good", 200
-        else:
-            return 'Not a valid direction', 400
 
     def unknown_weights():
         list_of_unknown = []
@@ -93,7 +96,7 @@ class Weight():
                 flag = True
             except IOError as e:  # TODO write to LOGFILE
                 print('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 404
 
         elif fileName.endswith('.json'):
             try:
@@ -107,14 +110,13 @@ class Weight():
                 flag = True
             except IOError as e:  # TODO write to LOGFILE
                 print('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 404
 
         if convert:
             for i in range(len(weights)):
                 weights[i] = str(int(0.453592*float(weights[i])))
-                ids[i] = '"' + ids[i] + '"'
-
         for i in range(len(ids)):
+            ids[i] = '"' + ids[i] + '"'
             #print("id:"+ids[i]+", weight: "+weights[i])
             #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
             query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (
@@ -126,4 +128,25 @@ class Weight():
         if flag:
             return "OK"
         else:
-            return "Error"
+            return "Error", 404
+
+
+    def container_weight(id_num):
+        sql_select_Query = "select * from containers_registered where container_id=" + "'" + id_num + "'"
+        rows = Connection.Mysql.exec_query(sql_select_Query)
+
+        if not rows:
+            abort(404)
+        return str(rows[0][1])
+
+    def last_action(id_num,direction):
+        if direction:
+            sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " and direction in " + "('in','out')" + " order by datetime desc limit 1" 
+        else:
+            sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " order by datetime desc limit 1" 
+        
+        rows = Connection.Mysql.exec_query(sql_select_Query)
+        if not rows or rows[0][2] == "none":
+            return "not found"
+            
+        return rows[0]

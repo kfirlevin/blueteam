@@ -69,28 +69,34 @@ def weight_post():
             return 'Not a valid produce', 404
         if request.form.get('force') == 'true':
             force = True
+        truckTara = request.form.get('truckTara')
+        if  int(truckTara) < 0:
+                return 'Not a valid truckTara', 404
 
 
         if truckId == "na":
-            query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+            query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+truckTara+","+ "'"+produce+ "'"+")"
             Connection.Mysql.exec_query(query)
             return "na to do"
         
 
         data=Weight.last_action(truckId,True)
+        logging.warning("this result {}".format(str(data)))
+
         if direction == "in":
             if data == "not found" or data[2] == 'out':
-                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+truckTara+","+ "'"+produce+ "'"+")"
                 result = Connection.Mysql.exec_query(query)
                 logging.warning("this result {}".format(str(result)))
-                return Transaction.transactionToJson(result)
+
+                return "INSERT"
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
                     result =Connection.Mysql.exec_query(query)
          
                     logging.warning("this result {}".format(str(result)))
-                    return Transaction.transactionToJson(result)
+                    return "UPDATE"
                 else:
                     return "error: The truck entered the factory but never left"
         elif direction == "out":
@@ -103,12 +109,16 @@ def weight_post():
                     if any(x in str(data[4]).split(',') for x in Weight.unknown_weights()):
                         neto = "na"
                     else:
+                        
+                        bruto =  data[5]
+                        truckTara = data[6]
                         sum_weight_containers = 0
                         for id_num in str(containers).split(','):
                             sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
-                        neto = int(data[5]) - sum_weight_containers - int(bruto)
-                    
-                    query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                        neto = int(bruto) - sum_weight_containers - int(truckTara)
+                        query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+str(bruto)+","+str(truckTara)+","+str(neto)+","+ "'"+produce+ "'"+")"
+                        result =Connection.Mysql.exec_query(query)
+
                     session = {
                     'id': truckId, # id of new transaction
                     'truck': truckId,

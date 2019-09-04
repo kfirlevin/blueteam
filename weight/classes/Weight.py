@@ -127,3 +127,12 @@ class Weight():
             return "OK"
         else:
             return "Error"
+
+
+    def container_weight(id_num):
+        sql_select_Query = "select * from containers_registered where container_id=" + "'" + id_num + "'"
+        rows = Connection.Mysql.exec_query(sql_select_Query)
+
+        if not rows:
+            return "Container not found"
+        return str(rows[0][1])

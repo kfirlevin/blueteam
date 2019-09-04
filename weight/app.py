@@ -167,6 +167,12 @@ def get_session(id_num):
         return Transaction.get_session(id_num)
     return "Error: DB Connection"
 
+@app.route('/container_weight/<string:id_num>', methods=['GET'])  # TODO
+def container_weight(id_num):
+    if Connection.Mysql.isHealth() == True:
+        return Weight.container_weight(id_num)
+    return "Error: DB Connection"
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

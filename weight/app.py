@@ -47,29 +47,36 @@ def weight_post():
     
     if request.method == 'GET':
             return render_template("weight-form.html")
+
+            
     elif request.method == 'POST':
         force = False
         direction = request.form.get('direction')
         if direction not in ("out", "in", "none"):
-            return 'Not a valid direction', 400
+            return 'Not a valid direction', 404
         truckId = request.form.get('truck')
         if truckId is None:
-            return 'No truck id?', 400
+            return 'No truck id?', 404
         time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
         containers = request.form.get('containers')
         if containers is None:
-            return 'There are no containers?', 400
+            return 'There are no containers?', 404
         bruto = request.form.get('bruto')
         if bruto is None:
-            return 'You forgot to enter weight', 400
+            return 'You forgot to enter weight', 404
         produce = request.form.get('produce')
         if produce not in ("tomato", "orange"):
-            return 'Not a valid produce', 400
+            return 'Not a valid produce', 404
         if request.form.get('force') == 'true':
             force = True
 
+
+        if truckId == "na":
+            query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+            Connection.Mysql.exec_query(query)
+            return "na to do"
         
-        #return "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+
         data=Weight.last_action(truckId,True)
         if direction == "in":
             if data == "not found" or data[2] == 'out':
@@ -90,17 +97,43 @@ def weight_post():
         elif direction == "out":
             if data == "not found":
                 abort(404)
-            if data[2] == 'in':
-                pass
-                #query="UPDATE transactions SET
-                #Connection.Mysql.exec_query(query)
             elif data[2] == 'in':
-                if force:
-                    pass
+                if not Weight.all_containers_here(str(containers).split(',')):
+                    return "containers not known in out", 404
                 else:
-                    pass
-        else:
-            pass
+                    if any(x in str(row[4]).split(',') for x in Weight.unknown_weights()):
+                        neto = "na"
+                    else:
+                        sum_weight_containers = 0
+                        for id_num in str(containers).split(','):
+                            sum_weight_containers = sum_weight_containers + Weight.container_weight(id_num)
+                        neto = data[5] - sum_weight_containers - bruto
+                    
+                    query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                    session = {
+                    'id': truckId, # id of new transaction
+                    'truck': truckId,
+                    'bruto': data[5], #bruto of in
+                    'truckTara': bruto,
+                    'neto': neto
+                    }
+                    return jsonify ({'session': session})
+
+
+
+
+            elif data[2] == 'out':
+                if force:
+                    query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
+                    Connection.Mysql.exec_query(query)
+                else:
+                    abort(404)
+        else: #direction=out
+            if data[2] == 'in':
+                abort(404)
+            else:
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                Connection.Mysql.exec_query(query)
 
         return("good"), 200
 

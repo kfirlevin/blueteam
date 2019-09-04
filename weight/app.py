@@ -84,9 +84,10 @@ def weight_post():
                 Connection.Mysql.exec_query(query)
             elif data[2] == 'in':
                 if force:
-                    pass
+                    query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
+                    Connection.Mysql.exec_query(query)
                 else:
-                    pass
+                    return "error: The truck entered the factory but never left"
         elif direction == "out":
             if data == "not found":
                 abort(404)
@@ -110,13 +111,15 @@ def weight_post():
                     'truckTara': bruto,
                     'neto': neto
                     }
+                    return jsonify ({'session': session})
 
 
 
 
             elif data[2] == 'out':
                 if force:
-                    pass #copy from nave
+                    query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
+                    Connection.Mysql.exec_query(query)
                 else:
                     abort(404)
         else: #direction=out

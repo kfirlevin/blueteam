@@ -70,7 +70,6 @@ def weight_post():
         if request.form.get('force') == 'true':
             force = True
 
-
         query="select id from transactions order by datetime desc limit 1;"
         NewID=Connection.Mysql.exec_query(query)
         NewID=str(int(NewID[0][0])+1)
@@ -90,18 +89,21 @@ def weight_post():
                 #return Transaction.transactionToJson(result)
                 result = Connection.Mysql.exec_query(query)
                 logging.warning("this result {}".format(str(result)))
-                return "INSERT"
-                result = Connection.Mysql.exec_query(query)
-                logging.warning("this result {}".format(str(result)))
+                # session = {
+                #     'id': NewID, 
+                #     'truck': truckId,
+                #     'bruto': bruto 
+                #         }
+                return jsonify (id=NewID,truck=truckId,bruto=bruto)
 
-                return "INSERT"
+
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
                     Connection.Mysql.exec_query(query)
-                    return "select * from transactions where truck=" + "'" + "4897891" + "'" + " order by datetime desc limit 1"
                     #logging.warning("this result {}".format(str(result)))
                     #return Transaction.transactionToJson(result)
+                    return jsonify (id=NewID,truck=truckId,bruto=bruto)
                 else:
                     return "error: The truck entered the factory but never left"
         elif direction == "out":
@@ -114,24 +116,17 @@ def weight_post():
                     if any(x in str(data[4]).split(',') for x in Weight.unknown_weights()):
                         neto = "na"
                     else:
-                        
-                        bruto =  data[5]
-                        
+                        truckTara = bruto #The weight of the truck in the 2nd weighing 
+                        oldBruto =  (data[5])
                         sum_weight_containers = 0
                         for id_num in str(containers).split(','):
                             sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
-                        neto = int(bruto) - sum_weight_containers - int(truckTara)
-                        query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+str(bruto)+","+str(neto)+","+ "'"+produce+ "'"+")"
-                        result =Connection.Mysql.exec_query(query)
+                        newBruto = int(truckTara) + sum_weight_containers
+                        neto = int(oldBruto) - sum_weight_containers - int(truckTara)
+                        query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+str(newBruto)+","+str(neto)+","+ "'"+produce+ "'"+")"
+                        Connection.Mysql.exec_query(query)
                     
-                    session = {
-                    'id': truckId, # id of new transaction
-                    'truck': truckId,
-                    'bruto': data[5], #bruto of in
-                    'truckTara': bruto,
-                    'neto': neto
-                    }
-                    return jsonify ({'session': session})
+                    return jsonify(id=NewID,truck=truckId,bruto=newBruto,truckTara=truckTara,neto=neto)
 
             elif data[2] == 'out':
                 if force:
@@ -139,14 +134,15 @@ def weight_post():
                     Connection.Mysql.exec_query(query)
                 else:
                     abort(404)
-        else: #direction=out
+        else: #direction=none
             if data[2] == 'in':
                 abort(404)
             else:
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 Connection.Mysql.exec_query(query)
+                return jsonify(id=NewID,truck=truckId,bruto=bruto)
 
-        return("good"), 200
+        return("seems like something weird have happened"), 200
 
     if Connection.Mysql.isHealth() == True:
         return Weight.weight_post(direction)

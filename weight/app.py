@@ -173,7 +173,7 @@ def get_session(id_num):
 @app.route('/container_weight/<string:id_num>', methods=['GET'])  # TODO
 def container_weight(id_num):
     if Connection.Mysql.isHealth() == True:
-        return Weight.container_weight(id_num)
+        return Weight.check_direction(id_num)
     return "Error: DB Connection"
 
 

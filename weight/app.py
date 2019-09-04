@@ -69,7 +69,7 @@ def weight_post():
             force = True
         #return "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
         data=Weight.last_action(truckId)
-        if direction is in ("in", "none"):
+        '''if direction in ["in", "none"]:
             if data == "not found" or data[2] == 'out'
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 Connection.Mysql.exec_query(query)
@@ -88,7 +88,7 @@ def weight_post():
                 if force:
                     pass
                 else:
-                    pass
+                    pass'''
 
         return("good"), 200
 
@@ -191,7 +191,7 @@ def get_session(id_num):
 @app.route('/container_weight/<string:id_num>', methods=['GET'])  # TODO
 def container_weight(id_num):
     if Connection.Mysql.isHealth() == True:
-        return Weight.check_direction(id_num)
+        return Weight.last_action(id_num,True)
     return "Error: DB Connection"
 
 

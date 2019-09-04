@@ -139,8 +139,12 @@ class Weight():
             abort(404)
         return str(rows[0][1])
 
-    def last_action(id_num):
-        sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " order by datetime desc limit 1" 
+    def last_action(id_num,direction):
+        if direction:
+            sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " and direction in " + "('in','out')" + " order by datetime desc limit 1" 
+        else:
+            sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " order by datetime desc limit 1" 
+        
         rows = Connection.Mysql.exec_query(sql_select_Query)
         if not rows or rows[0][2] == "none":
             return "not found"

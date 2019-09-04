@@ -12,7 +12,7 @@ app = Flask(__name__)
 config = {
   'user': 'db',
   'password': 'password',
-  'host': 'weight-db',
+  'host': os.environ.get('DB_HOST'),
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True
@@ -43,15 +43,35 @@ def weight_post():
     if request.method == 'GET':
             return render_template("weight-form.html")
     elif request.method == 'POST':
-        id = request.form.get('id')
-        datetime = request.form.get('datetime')
+        force = False
         direction = request.form.get('direction')
+        if direction not in ("out", "in", "none"):
+            return 'Not a valid direction', 400
+        if direction == 'none':
+            direction = 'in'
         truck = request.form.get('truck')
-        containers = request.form.get('containers')
-        bruto = request.form.get('bruto')
-        truckTara = request.form.get('truckTara')
+        if truck is None:
+            return 'No truck id?', 400
+        datetime = datetime.datetime.now()
+        containers = request.form.get('containers').split(',')
+        if containers is None:
+            return 'There are no containers?', 400
+        weight = request.form.get('weight')
+        if weight is None:
+            return 'You forgot to enter weight', 400
+        unit = request.form.get('unit')
+        if unit not in ("kg", "lbs"):
+            return 'unit not supported', 400
+        if unit == 'lbs':
+            weight = int(0.453592*float(weight))
+            unit = 'kg'
         produce = request.form.get('produce')
-    if Connection.Mysql.isHealth() == True : 
+        if produce not in ("tomato", "orange"):
+            return 'Not a valid produce', 400
+        if request.form.get('fouce') == 'true':
+            force = True
+
+    if Connection.Mysql.isHealth() == True:
         return Weight.weight_post(direction)
     return "Error: DB Connection"
 
@@ -60,29 +80,28 @@ def weight_post():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['GET'])
 def weights_get():
-    if Connection.Mysql.isHealth() == True : 
-        return Weight.weights_get(request.args.get('from'),request.args.get('to'),request.args.get('filter'))
+    if Connection.Mysql.isHealth() == True:
+        return Weight.weights_get(request.args.get('from'), request.args.get('to'), request.args.get('filter'))
     return "Error: DB Connection"
 
 
-    
 # Author:
 # TODO Add Comments - Description
 @app.route('/unknown', methods=['GET'])
 def unknown_weights():
-    if Connection.Mysql.isHealth() == True : 
+    if Connection.Mysql.isHealth() == True:
         return Weight.unknown_weights()
     return "Error: DB Connection"
 
 
 # Author:
 # TODO Add Comments - Description
-@app.route('/batch-weight',  methods = ['GET', 'POST'])
+@app.route('/batch-weight',  methods=['GET', 'POST'])
 def batch_weight():
     if request.method == 'GET':
         return render_template("betch-weight.html")
     elif request.method == 'POST':
-        if Connection.Mysql.isHealth() == True : 
+        if Connection.Mysql.isHealth() == True:
 
             fileName = request.form.get('file')        
             return Weight.batch_weight(fileName)
@@ -90,11 +109,9 @@ def batch_weight():
         return "Error: DB Connection"
         
 
-
-
 # Author:
 # TODO Add Comments - Description
-#GET /weight?from=t1&to=t2&filter=f
+# GET /weight?from=t1&to=t2&filter=f
 @app.route('/all_con', methods=['GET'])
 def get_weight():
 
@@ -116,7 +133,7 @@ def get_weight():
 
 # Author:
 # TODO Add Comments - Description
-#GET /weight?from=t1&to=t2&filter=f
+# GET /weight?from=t1&to=t2&filter=f
 @app.route('/all_transactions', methods=['GET'])
 def get_transaction():
 
@@ -133,22 +150,23 @@ def get_transaction():
 
 # Author:
 # TODO Add Comments - Description
-## GET /item/<id>?from=t1&to=t2
-@app.route('/item/<string:id_num>', methods=['GET']) # TODO
+# GET /item/<id>?from=t1&to=t2
+@app.route('/item/<string:id_num>', methods=['GET'])  # TODO
 def get_item(id_num):
-    if Connection.Mysql.isHealth() == True : 
-        return Item.get_items(request.args.get('from'),request.args.get('to'),id_num)
+    if Connection.Mysql.isHealth() == True:
+        return Item.get_items(request.args.get('from'), request.args.get('to'), id_num)
     return "Error: DB Connection"
 
 
 # Author: 
 # TODO Add Comments - Description
 #   GET /session/<id>
-@app.route('/session/<string:id_num>', methods=['GET']) # TODO
+@app.route('/session/<string:id_num>', methods=['GET'])  # TODO
 def get_session(id_num):
-    if Connection.Mysql.isHealth() == True : 
+    if Connection.Mysql.isHealth() == True:
         return Transaction.get_session(id_num)
     return "Error: DB Connection"
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

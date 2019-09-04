@@ -22,10 +22,10 @@ class Mysql(object):
             rows = cursor.fetchall()
         except mysql.connector.Error as err:
             print(err)
-            return 'Failure', 500 , err
+            return 'Failure', 500, err
         cnx.close()
         return rows
-    
+
     def health():
         try:
             cnx = mysql.connector.connect(**config)
@@ -43,8 +43,3 @@ class Mysql(object):
             return False
         cnx.close()
         return True
-       
-
-
-
-        

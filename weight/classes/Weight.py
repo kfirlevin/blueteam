@@ -134,5 +134,13 @@ class Weight():
         rows = Connection.Mysql.exec_query(sql_select_Query)
 
         if not rows:
-            return "Container not found"
+            abort(404)
         return str(rows[0][1])
+
+    def check_direction(id_num):
+        sql_select_Query = "select direction from transactions where truck=" + "'" + id_num + "'" + " order by datetime desc limit 1" 
+        rows = Connection.Mysql.exec_query(sql_select_Query)
+        if not rows:
+            abort(404)
+            
+        return str(rows[0][0])

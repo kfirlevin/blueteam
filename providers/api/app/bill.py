@@ -57,7 +57,7 @@ def handleBill(id):
         allSessions = []
         total_payment = 0
         sessionCount = 0
-        hostlocal = "http://localhost:5000"
+        hostlocal = os.environ.get('DB_HOST')
         hostprod = "http://blue.develeap.com:8090"
         ratesfile = ps.read_excel(f'http://localhost:5000/rates')
 
@@ -89,7 +89,7 @@ def handleBill(id):
             sessionCount += len(truckData["sessions"])
             for sessionid in truckData["sessions"]:
                 try:
-                    tmp = json.loads(requests.get(buildPath(hostlocal, "sessionMock", id=str(sessionid)) + urlparams).content)
+                    tmp = json.loads(requests.get(buildPath(hostlocal, "session", id=str(sessionid)) + urlparams).content)
                     logging.info(tmp)
                     if tmp["direction"] == "out":
                         allSessions.append(tmp)

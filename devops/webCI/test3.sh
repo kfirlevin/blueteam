@@ -4,9 +4,9 @@ test_names=( docker-test_prov-db-test docker-test_providers-server docker-test_w
 
 pushd .
 cd /blueteam/devops/docker-test
-git checkout providers
+git checkout weight
 git pull
-docker-compose up --build -d
+docker-compose up --build --abort-on-container-exit
 
 ## Check if test servers are up
 counter=0

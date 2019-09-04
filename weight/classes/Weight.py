@@ -3,7 +3,7 @@ from flask import jsonify, abort
 import datetime
 import csv
 import json
-
+import logging
 
 class Weight():
 

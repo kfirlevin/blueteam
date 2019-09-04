@@ -70,7 +70,10 @@ def weight_post():
         if request.form.get('force') == 'true':
             force = True
 
-
+        query="select id from transactions order by datetime desc limit 1;"
+        NewID=Connection.Mysql.exec_query(query)
+        NewID=str(int(NewID[0][0])+1)
+        
         if truckId == "na":
             query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
             Connection.Mysql.exec_query(query)
@@ -81,16 +84,16 @@ def weight_post():
         if direction == "in":
             if data == "not found" or data[2] == 'out':
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
-                result = Connection.Mysql.exec_query(query)
-                logging.warning("this result {}".format(str(result)))
-                return "INSERT"
+                Connection.Mysql.exec_query(query)
+                #logging.warning("this result {}".format(str(result)))
+                #return Transaction.transactionToJson(result)
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
-                    result =Connection.Mysql.exec_query(query)
-         
-                    logging.warning("this result {}".format(str(result)))
-                    return "UPDATE"
+                    Connection.Mysql.exec_query(query)
+                    return "select * from transactions where truck=" + "'" + "4897891" + "'" + " order by datetime desc limit 1"
+                    #logging.warning("this result {}".format(str(result)))
+                    #return Transaction.transactionToJson(result)
                 else:
                     return "error: The truck entered the factory but never left"
         elif direction == "out":
@@ -117,9 +120,6 @@ def weight_post():
                     'neto': neto
                     }
                     return jsonify ({'session': session})
-
-
-
 
             elif data[2] == 'out':
                 if force:

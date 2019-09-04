@@ -10,12 +10,12 @@ import os
 
 app = Flask(__name__)
 config = {
-    'user': 'db',
-    'password': 'password',
-    'host': os.environ.get('MYSQL_HOST'),
-    'port': '3306',
-    'database': 'weight',
-    'raise_on_warnings': True
+  'user': 'db',
+  'password': 'password',
+  'host': 'mysql',
+  'port': '3306',
+  'database': 'weight',
+  'raise_on_warnings': True
 }
 
 
@@ -41,7 +41,7 @@ def health():
 @app.route('/weight', methods=['POST'])
 def weight_post():
     if request.method == 'GET':
-        return render_template("weight-form.html")
+            return render_template("weight-form.html")
     elif request.method == 'POST':
         force = False
         direction = request.form.get('direction')
@@ -75,7 +75,7 @@ def weight_post():
         return Weight.weight_post(direction)
     return "Error: DB Connection"
 
-
+    
 # Author:
 # TODO Add Comments - Description
 @app.route('/weight', methods=['GET'])
@@ -103,11 +103,11 @@ def batch_weight():
     elif request.method == 'POST':
         if Connection.Mysql.isHealth() == True:
 
-            fileName = request.form.get('file')
+            fileName = request.form.get('file')        
             return Weight.batch_weight(fileName)
 
         return "Error: DB Connection"
-
+        
 
 # Author:
 # TODO Add Comments - Description
@@ -121,13 +121,13 @@ def get_weight():
     list_of_unknown = []
 
     for row in rows:
-        list_of_unknown.append(
-            {
-                "container_id": row[0],
-                "weight": row[1],
-                "unit": row[2]
+         list_of_unknown.append(
+           {
+            "container_id": row[0],
+            "weight": row[1],
+            "unit": row[2]
             }
-        )
+         )
     return jsonify(list_of_unknown)
 
 
@@ -143,9 +143,9 @@ def get_transaction():
     list_of_unknown = []
 
     for row in rows:
-        list_of_unknown.append(
-            Transaction.transactionToJson(row)
-        )
+         list_of_unknown.append(
+             Transaction.transactionToJson(row)
+         )
     return jsonify(list_of_unknown)
 
 # Author:
@@ -158,7 +158,7 @@ def get_item(id_num):
     return "Error: DB Connection"
 
 
-# Author:
+# Author: 
 # TODO Add Comments - Description
 #   GET /session/<id>
 @app.route('/session/<string:id_num>', methods=['GET'])  # TODO

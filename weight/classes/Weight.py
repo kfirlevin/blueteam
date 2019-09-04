@@ -3,7 +3,7 @@ from flask import jsonify, abort
 import datetime
 import csv
 import json
-
+import logging
 
 
 class Weight():
@@ -120,9 +120,8 @@ class Weight():
         if convert:
             for i in range(len(weights)):
                 weights[i] = str(int(0.453592*float(weights[i])))
-                ids[i] = '"' + ids[i] + '"'
-
         for i in range(len(ids)):
+            ids[i] = '"' + ids[i] + '"'
             #print("id:"+ids[i]+", weight: "+weights[i])
             #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
             query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (

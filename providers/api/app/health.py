@@ -20,6 +20,7 @@ def health():
         'port': '3306',
         'database': 'billdb'
     }
+
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()
@@ -28,7 +29,8 @@ def health():
         cursor.close()
         connection.close()
         return 0
-    except:
+    except ValueError as ve:    
+        print(ve)
         return 1
 
 

@@ -6,7 +6,7 @@ pushd .
 cd /blueteam/devops/docker-test
 git checkout providers
 git pull
-docker-compose up --build --abort-on-container-exit
+docker-compose up --build -d
 
 ## Check if test servers are up
 counter=0

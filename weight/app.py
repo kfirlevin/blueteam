@@ -81,16 +81,15 @@ def weight_post():
         if direction == "in":
             if data == "not found" or data[2] == 'out':
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
-                Connection.Mysql.exec_query(query)
-                query="SELECT IDENT_CURRENT(‘transactions’)"
                 result = Connection.Mysql.exec_query(query)
+                logging.warning("this result {}".format(str(result)))
                 return Transaction.transactionToJson(result)
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
-                    Connection.Mysql.exec_query(query)
-                    query="SELECT IDENT_CURRENT(‘transactions’)"
-                    result = Connection.Mysql.exec_query(query)
+                    result =Connection.Mysql.exec_query(query)
+         
+                    logging.warning("this result {}".format(str(result)))
                     return Transaction.transactionToJson(result)
                 else:
                     return "error: The truck entered the factory but never left"
@@ -101,13 +100,13 @@ def weight_post():
                 if not Weight.all_containers_here(str(containers).split(',')):
                     return "containers not known in out", 404
                 else:
-                    if any(x in str(row[4]).split(',') for x in Weight.unknown_weights()):
+                    if any(x in str(data[4]).split(',') for x in Weight.unknown_weights()):
                         neto = "na"
                     else:
                         sum_weight_containers = 0
                         for id_num in str(containers).split(','):
-                            sum_weight_containers = sum_weight_containers + Weight.container_weight(id_num)
-                        neto = data[5] - sum_weight_containers - bruto
+                            sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
+                        neto = int(data[5]) - sum_weight_containers - int(bruto)
                     
                     query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                     session = {

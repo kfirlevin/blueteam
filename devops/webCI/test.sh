@@ -1,6 +1,6 @@
 #!/bin/bash
-prod_names=( prov-db-prod docker-prod_providers-server weight-db-prod docker-prod_weight-server)
-test_names=( prov-db-test docker-test_providers-server weight-db-test docker-test_weight-server)
+prod_names=( docker-prod_prov-db-prod docker-prod_providers-server docker-prod_weight-db-prod docker-prod_weight-server)
+test_names=( docker-test_prov-db-test docker-test_providers-server docker-test_weight-db-test docker-test_weight-server)
 
 pushd .
 cd /blueteam/devops/docker-test

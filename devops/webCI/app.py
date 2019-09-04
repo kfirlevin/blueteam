@@ -20,10 +20,10 @@ def run_testing_env():
     info = json.dumps(request.json)
     temp_branch = info[info.find("refs/heads")+10:info.find("refs/heads")+50]
     branch = temp_branch[1:temp_branch.find("repo")-4]
-    if branch == "master"
-    subprocess.Popen("./test.sh")
-    elif branch == "providers"
-    subprocess.Popen("./test2.sh providers")
-    elif branch == "weights"
-    subprocess.Popen("./test2.sh weights")
+    if branch == "master":
+        subprocess.Popen("./test.sh")
+    elif branch == "providers":
+        subprocess.Popen("./test2.sh providers")
+    elif branch == "weight":
+        subprocess.Popen("./test2.sh weights")
     return "Yes"

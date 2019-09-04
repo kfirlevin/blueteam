@@ -19,7 +19,11 @@ def down():
 def run_testing_env():
     shuki = request.get_json()
     print shuki
-    print shuki['ref'].split('/')[2]
-    if shuki['ref'].split('/')[2] == "providers":
+    branch = shuki['ref'].split('/')[2]
+    if shuki['ref'].split('/')[2] == "master":
         subprocess.Popen("./test.sh")
+    elif branch == "providers":
+        subprocess.Popen("./test2.sh")
+    elif branch == "weight":
+        subprocess.Popen("/test3.sh")
     return "Yes"

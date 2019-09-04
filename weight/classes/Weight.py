@@ -1,6 +1,8 @@
 from classes import Connection
 from flask import  jsonify, abort
 import datetime
+import csv
+import json
 
 class Weight():
     
@@ -50,7 +52,6 @@ class Weight():
         
         return jsonify({'transactions': list_of_transactions})
 
-
     def weight_post(direction):
         if direction in ['in', 'out', 'none']:
             return "We're good" , 200        
@@ -66,3 +67,61 @@ class Weight():
             if  not str(row[1]).isdigit():
                 list_of_unknown.append(row[0])
         return list_of_unknown
+
+    def batch_weight(fileName):
+        flag= False
+        ids=[]
+        weights=[]
+        convert=False
+        print(type(fileName))
+        print(fileName)
+        if fileName.endswith('.csv'):
+            try:
+                spamReader = csv.reader(open('./in/'+fileName, newline=''), delimiter=',', quotechar='|')
+                ids=[]
+                weights=[]
+                for row in spamReader:
+                    ids.append(row[0])
+                    weights.append(row[1])
+                if str(weights[0]) == '"lbs"':
+                    convert=True
+                weights.pop(0)
+                ids.pop(0)
+                flag=True
+            except IOError as e: # TODO write to LOGFILE
+                print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+
+        elif fileName.endswith('.json'):
+            try:
+                with open('./in/'+fileName) as json_file:
+                    data=json.loads(json_file.read())
+                if data[1]["unit"]=='lbs':
+                    convert = True
+                for truck in data:
+                    ids.append(truck["id"])
+                    weights.append(truck["weight"])
+                flag=True
+            except IOError as e: # TODO write to LOGFILE
+                print ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+              
+        if convert:
+            for i in range (len(weights)):
+                weights[i] = str(int(0.453592*float(weights[i])))
+                ids[i]='"' + ids[i] + '"'
+        
+        for i in range(len(ids)):
+            #print("id:"+ids[i]+", weight: "+weights[i])
+            #toSend.append("('{}', '{}', 'kg')".format(ids[i], weights[i]))
+            query = "INSERT INTO containers_registered(container_id,weight,unit) VALUES(%s,%s,'kg');" % (ids[i],weights[i])
+            print(query)
+            Connection.Mysql.exec_query(query)
+            print(query)
+        
+        
+        if flag:    
+            return "OK"
+        else: 
+            return "Error"
+

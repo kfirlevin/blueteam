@@ -70,10 +70,11 @@ def weight_post():
         if request.form.get('force') == 'true':
             force = True
 
+
         query="select id from transactions order by datetime desc limit 1;"
         NewID=Connection.Mysql.exec_query(query)
         NewID=str(int(NewID[0][0])+1)
-        
+
         if truckId == "na":
             query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
             Connection.Mysql.exec_query(query)
@@ -87,6 +88,13 @@ def weight_post():
                 Connection.Mysql.exec_query(query)
                 #logging.warning("this result {}".format(str(result)))
                 #return Transaction.transactionToJson(result)
+                result = Connection.Mysql.exec_query(query)
+                logging.warning("this result {}".format(str(result)))
+                return "INSERT"
+                result = Connection.Mysql.exec_query(query)
+                logging.warning("this result {}".format(str(result)))
+
+                return "INSERT"
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
@@ -106,12 +114,16 @@ def weight_post():
                     if any(x in str(data[4]).split(',') for x in Weight.unknown_weights()):
                         neto = "na"
                     else:
+                        
+                        bruto =  data[5]
+                        
                         sum_weight_containers = 0
                         for id_num in str(containers).split(','):
                             sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
-                        neto = int(data[5]) - sum_weight_containers - int(bruto)
+                        neto = int(bruto) - sum_weight_containers - int(truckTara)
+                        query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+str(bruto)+","+str(neto)+","+ "'"+produce+ "'"+")"
+                        result =Connection.Mysql.exec_query(query)
                     
-                    query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                     session = {
                     'id': truckId, # id of new transaction
                     'truck': truckId,

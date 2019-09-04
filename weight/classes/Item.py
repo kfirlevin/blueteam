@@ -1,6 +1,7 @@
 from classes import Connection
 from flask import jsonify, abort
 import datetime
+from classes.Weight import Weight
 
 
 class Item():

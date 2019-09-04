@@ -7,6 +7,7 @@ from classes.Weight import Weight
 from classes.Item import Item
 from classes.Transaction import Transaction
 import os
+import logging
 
 app = Flask(__name__)
 config = {
@@ -27,6 +28,8 @@ config = {
 # TODO Add Comments - Description
 @app.route('/')
 def index():
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.warning('is when this event was logged.')
     return render_template("index.html")
 
 

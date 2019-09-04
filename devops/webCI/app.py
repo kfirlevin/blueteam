@@ -23,7 +23,7 @@ def run_testing_env():
     if branch == "master":
         subprocess.Popen("./test.sh")
     elif branch == "providers":
-        subprocess.Popen("./test2.sh providers")
+        subprocess.Popen("./test2.sh {}".format(branch))
     elif branch == "weight":
-        subprocess.Popen("./test2.sh weights")
+        subprocess.Popen("./test2.sh {}".format(branch))
     return "Yes"

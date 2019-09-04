@@ -112,17 +112,18 @@ def handleProviderId(providerid):
 @app.route('/truck/<id>',methods=['GET'])
 def handleTruckGet(id):
     if request.method == 'GET':
+        weighthost = 'http://'+os.environ.get('WEIGHT_HOST')
         From=request.args.get('from')
         To=request.args.get('to')
         if From:
             if To:
-                return requests.get(f'http://blue.develeap.com:8090/item/{id}?from={From}&to={To}').content
+                return requests.get(weighthost + f'/item/{id}?from={From}&to={To}').content
             else:
-                return requests.get(f'http://blue.develeap.com:8090/item/{id}?from={From}').content
+                return requests.get(weighthost + f'/item/{id}?from={From}').content
         else:
             if To:
-                return requests.get(f'http://blue.develeap.com:8090/item/{id}?to={To}').content
+                return requests.get(weighthost + f'/item/{id}?to={To}').content
             else:
-                return requests.get(f'http://blue.develeap.com:8090/item/{id}').content
+                return requests.get(weighthost + f'/item/{id}').content
         
 

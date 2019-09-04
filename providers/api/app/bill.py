@@ -60,6 +60,7 @@ def handleBill(id):
         hostlocal = os.environ.get('DB_HOST')
         hostprod = "http://blue.develeap.com:8090"
         ratesfile = ps.read_excel(f'http://localhost:5000/rates')
+        weighthost = os.environ.get('WEIGHT_HOST')
 
         # getting relevant rates by provider 
         ref_dict = {}
@@ -78,19 +79,28 @@ def handleBill(id):
                 urlparams = f'?to={To}'
             else:
                 urlparams = f''
-        
         for truckID in trucksIdsByProv:
             try:
-                allTrucksInfo.append(json.loads(requests.get(buildPath(hostlocal, "truck", id=str(truckID)) + urlparams).content)["item"])
+                path=buildPath('http://localhost:5000', "truck", id=str(truckID))
+                logging.info('path: '+path)
+                req = requests.get(path + urlparams)
+                logging.info('req: '+req)
+                allTrucksInfo.append(json.loads(req.content)["item"])
             except Exception:
                 pass
         logging.info(allTrucksInfo)
+        logging.info("LOGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         for truckData in allTrucksInfo:
             sessionCount += len(truckData["sessions"])
+            logging.info('sessionCount: ' + str(sessionCount))
             for sessionid in truckData["sessions"]:
+                logging.info('sessionid: '+ str(sessionid))
                 try:
+                    logging.info(buildPath(hostlocal, "session", id=str(sessionid)))
                     tmp = json.loads(requests.get(buildPath(hostlocal, "session", id=str(sessionid)) + urlparams).content)
+                    
                     logging.info(tmp)
+                    logging.info('tmp')
                     if tmp["direction"] == "out":
                         allSessions.append(tmp)
                         #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))

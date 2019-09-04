@@ -42,6 +42,7 @@ class Transaction():
         if rows[0][2] == "out":
             session = {
                 'id': id_num,
+                'direction': rows[0][2],
                 'truck': rows[0][3],
                 'bruto': rows[0][5],
                 'truckTara': rows[0][6],
@@ -50,6 +51,7 @@ class Transaction():
         else:
             session = {
                 'id': id_num,
+                'direction': rows[0][2],
                 'truck': rows[0][3],
                 'bruto': rows[0][5]
             }

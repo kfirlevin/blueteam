@@ -55,7 +55,7 @@ def weight_post():
         truck = request.form.get('truck')
         if truck is None:
             return 'No truck id?', 400
-        datetime = datetime.datetime.now()
+        currentTime = datetime.datetime.now()
         containers = request.form.get('containers').split(',')
         if containers is None:
             return 'There are no containers?', 400
@@ -73,6 +73,9 @@ def weight_post():
             return 'Not a valid produce', 400
         if request.form.get('fouce') == 'true':
             force = True
+        print(weight)
+        return(weight , produce ) , 200
+        #return(), 200
 
     if Connection.Mysql.isHealth() == True:
         return Weight.weight_post(direction)

@@ -34,4 +34,7 @@ def testAPI():
 
 
 if __name__ == "__main__":
-    testAPI()
+    if testAPI():
+        print("True")
+    else:
+        print("False")

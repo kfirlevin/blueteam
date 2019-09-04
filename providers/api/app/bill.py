@@ -54,16 +54,28 @@ def handleBill(id):
 
         sessionCount = 0
         for truckID in trucksIdsByProv:
-            allTrucksInfo.append(json.loads(requests.get(f'http://localhost:5000/truck/{truckID}?from=11&to=12').content))
-
+            try:
+                allTrucksInfo.append(json.loads(requests.get(f'http://localhost:5000/truck/{truckID}?from=20000101150000').content["name"])["item"])
+            except Exception:
+                pass
+        logging.info(allTrucksInfo)
         for truckData in allTrucksInfo:
             sessionCount += len(truckData["sessions"])
             for sessionid in truckData["sessions"]:
-                allSessions.append(json.loads(requests.get(f'http://localhost:5000/sessionMock/{sessionid}').content))
-
+                try:
+                    tmp = json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content)
+                    if tmp["direction"] == "out"
+                        allSessions.append(tmp)
+                        #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))
+                except Exception:
+                    pass
+        try:
+            name = json.loads(requests.get(f'http://localhost:5000/provider/{id}').content)["name"]
+        except Exception:
+            name = "not exist"
         Bill = {
             "id"   : id,
-            "name" : "name",
+            "name" : name ,
             "from" : From,
             "to"   : To,
             "truckCount":len(allTrucksInfo),
@@ -81,10 +93,11 @@ def handleBill(id):
         logging.info(Bill["products"])
         for sessionData in allSessions:
             new_product = str(sessionData["produce"]).lower()
-            logging.info(sessionData["produce"])
             for index in Bill["products"]:
                 existing_product = str(index["product"]).lower()
+                flag_update = 0
                 if existing_product == new_product:
+                    flag_update = 1
                     index.update({
                         "product": sessionData["produce"] ,
                         "count" : index["count"]+1 ,
@@ -92,7 +105,9 @@ def handleBill(id):
                         "rate"  : ref_dict[new_product] ,
                         "pay"   : index["pay"]+(sessionData["neto"]*ref_dict[new_product])
                     })
-                else:
+                    total_payment += index["pay"]
+            # if product does not exist, creat one    
+            if flag_update == 0:
                     Bill["products"].append({
                         "product" : sessionData["produce"] ,
                         "count" : 1 ,
@@ -100,7 +115,7 @@ def handleBill(id):
                         "rate"  : ref_dict[new_product] ,
                         "pay"   : sessionData["neto"]*ref_dict[new_product]
                     })
-                total_payment += index["pay"]
+                    total_payment += index["pay"]
         Bill["total"] = total_payment
         logging.info(Bill)
         return "A"

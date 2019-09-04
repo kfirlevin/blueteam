@@ -1,4 +1,5 @@
 FROM python:3.7-slim
+ENV DB_HOST="mysql" 
 EXPOSE 5000
 WORKDIR /src
 RUN pip3 install flask

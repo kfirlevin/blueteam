@@ -2,7 +2,7 @@ version: '3'
 
 services:
   providers-db:
-    container_name: db
+    container_name: prov-db-prod
     build: ../../providers/db/
     volumes:
       - /home/${USER}/prod-dbs/providers-data/:/var/lib/mysql
@@ -13,8 +13,11 @@ services:
       - '8080:5000'
     volumes:
       - /home/${USER}/prod-prov_rates/:/in/
+    environment:
+      - DB_HOST=prov-db-prod
+
   weight-db:
-    container_name: mysql
+    container_name: weight-db-prod
     build: ../../weight/Mysql-db/
     volumes:
       - /home/${USER}/prod-dbs/weight-data/:/var/lib/mysql
@@ -23,3 +26,5 @@ services:
     build: ../../weight/
     ports:
       - '8090:5000'
+    environment:
+      - DB_HOST=weight-db-prod

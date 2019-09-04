@@ -2,7 +2,7 @@
 import os
 import telebot
 
-
+#czdvf
 def testresult(providers, weight):
     if providers == 0 and weight == 0:
         return "True"

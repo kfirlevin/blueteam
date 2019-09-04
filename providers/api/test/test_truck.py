@@ -18,4 +18,4 @@ def test_truck_post_bad_2():
     json1 = json.loads(req.content)
     requests.post(URI + 'truck?provider='+json1['id']+'&id=5')
     req3 = requests.post(URI + 'truck?provider='+json1['id']+'&id=5')
-    assert req3.status_code != 200
+    assert req3.status_code != 200#

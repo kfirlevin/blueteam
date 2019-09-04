@@ -65,19 +65,22 @@ def weight_post():
         produce = request.form.get('produce')
         if produce not in ("tomato", "orange"):
             return 'Not a valid produce', 400
-        if request.form.get('fouce') == 'true':
+        if request.form.get('force') == 'true':
             force = True
+
+        
         #return "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
-        data=Weight.last_action(truckId)
+        data=Weight.last_action(truckId,True)
         if direction == "in":
             if data == "not found" or data[2] == 'out':
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 Connection.Mysql.exec_query(query)
             elif data[2] == 'in':
                 if force:
-                    pass
+                    query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
+                    Connection.Mysql.exec_query(query)
                 else:
-                    pass
+                    return "error: The truck entered the factory but never left"
         elif direction == "out":
             if data == "not found":
                 abort(404)

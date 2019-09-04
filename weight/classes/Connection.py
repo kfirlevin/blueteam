@@ -1,10 +1,10 @@
 import mysql.connector
-
+import os
 
 config = {
     'user': 'db',
     'password': 'password',
-    'host': 'weight-db',
+    'host': os.environ.get('DB_HOST'),
     'port': '3306',
     'database': 'weight',
     'raise_on_warnings': True

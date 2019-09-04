@@ -47,8 +47,8 @@ def weight_post():
         direction = request.form.get('direction')
         if direction not in ("out", "in", "none"):
             return 'Not a valid direction', 400
-        if direction == 'none'
-        direction = 'in'
+        if direction == 'none':
+            direction = 'in'
         truck = request.form.get('truck')
         if truck is None:
             return 'No truck id?', 400

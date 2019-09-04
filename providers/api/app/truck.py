@@ -105,20 +105,6 @@ def handleTruck():
         return json.dumps(res,sort_keys=True,indent=4)
 
 #specific truck data
-
-# @app.route('/truck/<id>',methods=['GET'])
-# def handleTruckGet(id):
-#     if request.method == 'GET':
-#         From=request.args.get('from')
-#         To=request.args.get('to')
-#         jsonMOCK = {
-#             "id" : 123,
-#             "tara" : 2000,
-#             "sessions" : [1]
-#         }
-#         return jsonMOCK
-
-# get all trucks of specific provider
 @app.route('/trucksbyprov/<providerid>',methods=['GET'])
 def handleProviderId(providerid):
     return getTrucksByProv(providerid)

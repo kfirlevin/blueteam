@@ -46,7 +46,6 @@ def truckPut(truckId,providerId):
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
     query = "UPDATE Trucks SET provider_id = (select id from Provider where name = %s) where id = %s ;"
-
     try:
         cursor.execute(query, (providerId, truckId))
         connection.commit()
@@ -66,6 +65,27 @@ def truckPut(truckId,providerId):
     connection.close()
     return dictionary
 
+def getTrucksByProv(providerid):
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor()
+    query = 'select * from Trucks where provider_id = %s;'%providerid
+    logging.info(query)
+    try:
+        cursor.execute(query)
+        logging.info(str(query))
+    except Exception as e:
+        logging.error(e)
+        return 'error ' + str(e)
+    results = cursor.fetchall()
+    dictionary = {}
+    for key, value in results:
+        dictionary[key] = value
+    cursor.close()
+    connection.close()
+    return dictionary
+
+
+#  Routing -->
 @app.route('/truck',methods=['POST','PUT'])
 def handleTruck():
     if request.method == 'POST':
@@ -84,7 +104,7 @@ def handleTruck():
             return str(res),500
         return json.dumps(res,sort_keys=True,indent=4)
 
-
+#specific truck
 @app.route('/truck/<id>',methods=['GET'])
 def handleTruckGet(id):
     if request.method == 'GET':
@@ -93,10 +113,16 @@ def handleTruckGet(id):
         jsonMOCK = {
             "id" : 123,
             "tara" : 2000,
-            "sessions" : [1,2,3,4,5]
+            "sessions" : [1]
         }
         return jsonMOCK
-        
+
+# get all trucks of specific provider
+@app.route('/trucksbyprov/<providerid>',methods=['GET'])
+def handleProviderId(providerid):
+    return getTrucksByProv(providerid)
+
+
 # @app.route('/truck/<id>',methods=['GET'])
 # def handleTruckGet(id):
 #     if request.method == 'GET':

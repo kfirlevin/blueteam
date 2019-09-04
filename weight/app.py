@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,abort
 import mysql.connector
 import datetime
 from typing import Dict, List
@@ -75,10 +75,16 @@ def weight_post():
             if data == "not found" or data[2] == 'out':
                 query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
                 Connection.Mysql.exec_query(query)
+                query="SELECT IDENT_CURRENT(‘transactions’)"
+                result = Connection.Mysql.exec_query(query)
+                return Transaction.transactionToJson(result)
             elif data[2] == 'in':
                 if force:
                     query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
                     Connection.Mysql.exec_query(query)
+                    query="SELECT IDENT_CURRENT(‘transactions’)"
+                    result = Connection.Mysql.exec_query(query)
+                    return Transaction.transactionToJson(result)
                 else:
                     return "error: The truck entered the factory but never left"
         elif direction == "out":
@@ -184,6 +190,10 @@ def get_item(id_num):
         return Item.get_items(request.args.get('from'), request.args.get('to'), id_num)
     return "Error: DB Connection"
 
+
+@app.route('/add_weight', methods=['GET'])
+def add_weight():  
+    return render_template("weight-form.html")
 
 # Author: 
 # TODO Add Comments - Description

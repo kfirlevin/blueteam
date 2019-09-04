@@ -39,6 +39,14 @@ def sql(value,req):
 def provider_get():
         return "WELCOME to providers please use PUT or POST request"
 
+@app.route('/provider/<id>', methods=["GET"])
+def provider_get_id(provider_id):
+        value=provider_id
+        hh=sql(f"SELECT id from Provider WHERE name='{value}' ",True)
+        if (hh != "ERROR"):
+                v1=hh[0]
+                return "{\"id\":\""+str(v1[-1])+"\"}"
+
 @app.route('/provider', methods=["POST"])
 def provider():
         value=request.args["provider_name"]

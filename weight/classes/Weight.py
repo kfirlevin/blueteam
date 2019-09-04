@@ -5,7 +5,15 @@ import csv
 import json
 import logging
 
+
 class Weight():
+
+    def validate(date_text):
+        try:
+            datetime.datetime.strptime(date_text, '%Y%m%d%I%M%S')
+        except ValueError:
+            return 0
+        return 1
 
     def weights_get(time_from, time_to, filter):
 
@@ -13,13 +21,13 @@ class Weight():
 
         if time_from is None:
             t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
-        elif str(time_from).isdigit():
+        elif Weight.validate(str(time_from)):
             t1 = time_from
         else:
             abort(404)
         if time_to is None:
             t2 = time_actual
-        elif str(time_to).isdigit():
+        elif Weight.validate(str(time_to)):
             t2 = time_to
         else:
             abort(404)
@@ -88,7 +96,7 @@ class Weight():
                 flag = True
             except IOError as e:  # TODO write to LOGFILE
                 print('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 404
 
         elif fileName.endswith('.json'):
             try:
@@ -102,7 +110,7 @@ class Weight():
                 flag = True
             except IOError as e:  # TODO write to LOGFILE
                 print('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror))
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 404
 
         if convert:
             for i in range(len(weights)):
@@ -120,7 +128,7 @@ class Weight():
         if flag:
             return "OK"
         else:
-            return "Error"
+            return "Error", 404
 
 
     def container_weight(id_num):

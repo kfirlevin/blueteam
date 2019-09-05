@@ -149,7 +149,7 @@ def weight_post():
                                 neto = int(oldBruto) - sum_weight_containers - int(truckTara)
                             produce=data[8]
                         query = "UPDATE transactions SET bruto = " + \
-                            str(newBruto) + " neto = "+str(neto) + " truckTara= " +str(truckTara) + " WHERE id = "+str(data[0])
+                            "'"+str(newBruto)+"'"+","+ " neto = "+"'"+str(neto) +"'"+","+ " truckTara = " +"'"+str(truckTara) +"'"+ " WHERE id = " +"'"+str(data[0])+"'"
                         Connection.Mysql.exec_query(query)
                         return jsonify (id=data[0],truck=truckId, bruto=oldBruto, truckTara=truckTara,neto=neto )
                 else:

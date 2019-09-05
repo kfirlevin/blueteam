@@ -1,6 +1,7 @@
 FROM docker/compose:1.25.0-rc2-debian
 RUN apt-get update
 RUN apt-get install git -y
+RUN apt-get install curl -y
 RUN git clone https://github.com/tomikonio/blueteam.git
 RUN apt-get install python -y
 RUN apt-get install python-pip -y 

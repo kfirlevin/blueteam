@@ -82,8 +82,6 @@ def handleBill(id):
         for truckID in trucksIdsByProv:
             try:
                 path=buildPath('http://localhost:5000', "truck", id=str(truckID))
-                logging.info(' path: '+path + urlparams)
-                logging.info(' urlparams: ' + urlparams)
                 req = requests.get(str(path) + str(urlparams))
                 logging.info(' req: '+str(req.content))
                 allTrucksInfo.append(json.loads(req.content)["item"])
@@ -92,7 +90,6 @@ def handleBill(id):
 
 
         logging.info(allTrucksInfo)
-        logging.info("LOGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         for truckData in allTrucksInfo:
             sessionCount += len(truckData["sessions"])
             for sessionid in truckData["sessions"]:
@@ -144,7 +141,7 @@ def handleBill(id):
                         "rate"  : ref_dict[new_product] ,
                         "pay"   : index["pay"]+(sessionData["neto"]*ref_dict[new_product])
                     })
-                    total_payment += index["pay"]
+                    total_payment += (sessionData["neto"]*ref_dict[new_product])
             # if product does not exist, creat one    
             if flag_update == 0:
                     Bill["products"].append({

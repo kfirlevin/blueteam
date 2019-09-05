@@ -103,7 +103,7 @@ def handleBill(id):
                     logging.info(tmp)
                     logging.info('tmp')
                     if tmp["session"]["direction"] == "out":
-                        allSessions.append(tmp)
+                        allSessions.append(tmp["session"])
                         #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))
                 except Exception as e:
                     logging.info('get session data error : ' + str(e))
@@ -122,13 +122,14 @@ def handleBill(id):
             "products":[] , 
             "total" : 0
         }
-        Bill["products"].append({
-            "product" : "apple" ,
-            "count" : 1 ,
-            "amount": 500 ,
-            "rate"  : 1 ,
-            "pay"   : 1000
-        })
+        # Bill["products"].append({
+        #     "product" : "apple" ,
+        #     "count" : 1 ,
+        #     "amount": 500 ,
+        #     "rate"  : 1 ,
+        #     "pay"   : 1000
+        # })
+        flag_update = 0
         for sessionData in allSessions:
             new_product = str(sessionData["produce"]).lower()
             for index in Bill["products"]:
@@ -153,7 +154,7 @@ def handleBill(id):
                         "rate"  : ref_dict[new_product] ,
                         "pay"   : sessionData["neto"]*ref_dict[new_product]
                     })
-                    total_payment += index["pay"]
+                    total_payment += sessionData["neto"]*ref_dict[new_product]
         Bill["total"] = total_payment
         logging.info(Bill)
         return Bill

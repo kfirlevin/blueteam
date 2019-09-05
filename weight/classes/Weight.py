@@ -132,7 +132,7 @@ class Weight():
                 flag = True
             except IOError as e:  # TODO write to LOGFILE
                 print('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 404
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 500
 
         elif fileName.endswith('.json'):
             try:
@@ -146,7 +146,7 @@ class Weight():
                 flag = True
             except IOError as e:  # TODO write to LOGFILE
                 print('I/O error({0}): {1}'.format(e.errno, e.strerror))
-                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 404
+                return ('I/O error({0}): {1}'.format(e.errno, e.strerror)), 500
 
         if convert:
             for i in range(len(weights)):
@@ -164,7 +164,7 @@ class Weight():
         if flag:
             return "OK"
         else:
-            return "Error", 404
+            return "Error", 500
 
     @staticmethod
     def container_weight(id_num):

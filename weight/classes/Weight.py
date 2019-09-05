@@ -8,6 +8,10 @@ import logging
 
 class Weight():
 
+    ################################################
+    # check if date_text is valid Datetime
+    ################################################
+    @staticmethod
     def validate(date_text):
         try:
             datetime.datetime.strptime(date_text, '%Y%m%d%I%M%S')
@@ -15,6 +19,19 @@ class Weight():
             return 0
         return 1
 
+
+
+    ################################################################
+    # get weights between to points (duration)  t1 - t2 & filter
+    #   - t1 - start time 
+    #   - t2 - end time
+    #   - filter = “in,out,none”
+    #  - default from - start day in week
+    #  - default to  - now
+    #  - default filter = “in,out,none”
+    ################################################################
+    
+    @staticmethod
     def weights_get(time_from, time_to, filter):
 
         time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
@@ -62,7 +79,7 @@ class Weight():
 
         return jsonify({'transactions': list_of_transactions})
 
-
+    @staticmethod
     def unknown_weights():
         list_of_unknown = []
         sql_select_Query = "select * from containers_registered"
@@ -72,7 +89,7 @@ class Weight():
             if not str(row[1]).isdigit():
                 list_of_unknown.append(row[0])
         return list_of_unknown
-
+    @staticmethod
     def batch_weight(fileName):
         flag = False
         ids = []
@@ -130,7 +147,7 @@ class Weight():
         else:
             return "Error", 404
 
-
+    @staticmethod
     def container_weight(id_num):
         sql_select_Query = "select * from containers_registered where container_id=" + "'" + id_num + "'"
         rows = Connection.Mysql.exec_query(sql_select_Query)
@@ -138,7 +155,7 @@ class Weight():
         if not rows:
             abort(404)
         return str(rows[0][1])
-
+    @staticmethod
     def last_action(id_num,direction):
         if direction:
             sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " and direction in " + "('in','out')" + " order by datetime desc limit 1" 
@@ -150,3 +167,12 @@ class Weight():
             return "not found"
             
         return rows[0]
+    @staticmethod
+    def all_containers_here(containers_list):
+        for id_num in containers_list:
+            sql_select_Query = "select * from containers_registered where container_id=" + "'" + id_num + "'"
+            rows = Connection.Mysql.exec_query(sql_select_Query)
+            if not rows:
+                return False
+
+        return True

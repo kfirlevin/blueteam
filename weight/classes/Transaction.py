@@ -4,7 +4,8 @@ import datetime
 
 
 class Transaction():
-
+    
+    @staticmethod
     def transactionToJson(row):
         return {
             "id": row[0],
@@ -17,7 +18,7 @@ class Transaction():
             "neto": row[7],
             "produce": row[8]
         }
-
+    @staticmethod
     def get_session(id_num):
 
         time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
@@ -42,15 +43,20 @@ class Transaction():
         if rows[0][2] == "out":
             session = {
                 'id': id_num,
+                'direction': rows[0][2],
                 'truck': rows[0][3],
                 'bruto': rows[0][5],
                 'truckTara': rows[0][6],
-                'neto': neto
+                'neto': neto,
+                'produce': rows[0][8]
             }
         else:
             session = {
                 'id': id_num,
+                'direction': rows[0][2],
                 'truck': rows[0][3],
-                'bruto': rows[0][5]
+                'bruto': rows[0][5],
+                'produce': rows[0][8]
+
             }
         return jsonify({'session': session})

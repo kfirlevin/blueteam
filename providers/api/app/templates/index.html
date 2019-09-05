@@ -16,6 +16,9 @@
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <script>
+
+    document.getElementById("link_rates").setAttribute('href', `${window.location.href}rates`);
+
     function get_health() 
     {        
         const Http = new XMLHttpRequest();
@@ -94,7 +97,7 @@
         value_from= document.getElementById("truck_from").value;
         value_to= document.getElementById("truck_to").value;
         value_id= document.getElementById("truck_id").value;
-        const url =`${window.location.href}truck/<${value_id}>?from=${value_from}&to=${value_to}`;
+        const url =`${window.location.href}truck/${value_id}?from=${value_from}&to=${value_to}`;
         Http.open("GET", url);
         Http.send();
         Http.onreadystatechange = (e) => {
@@ -154,7 +157,7 @@
         value_from= document.getElementById("bill_from").value;
         value_to= document.getElementById("bill_to").value;
         value_id= document.getElementById("provider_id").value;
-        const url =`${window.location.href}bill/<${value_id}>?from=${value_from}&to=${value_to}`;
+        const url =`${window.location.href}bill/${value_id}?from=${value_from}&to=${value_to}`;
         Http.open("GET", url);
         Http.send();
         Http.onreadystatechange = (e) => {
@@ -194,7 +197,7 @@
                 <BR>
                 <BR>
                 <h2>RATES API</h2>
-                <a href="HTTP://localhost:8081/rates">
+                <a id="link_rates" href="HTTP://localhost:8081/rates">
                     <button name="get_rates_btn" type="button" class="btn btn-primary">GET rates</button>
                 </a>
                 <BR>

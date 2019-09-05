@@ -17,8 +17,6 @@
 </head>
 <script>
 
-    document.getElementById("link_rates").setAttribute('href', `${window.location.href}rates`);
-
     function get_health() {
         const Http = new XMLHttpRequest();
         const url = `${window.location.href}health`
@@ -200,7 +198,7 @@
                 <div class="col-md-4">
                     <div id="container6" style="border: solid 1px black;height:300px">
                         <h4>RATES API TEST</h4>
-                        <a id="link_rates" href="HTTP://localhost:8081/rates">
+                        <a id="link_rates" href="">
                             <button name="get_rates_btn" type="button" class="btn btn-primary">GET rates</button>
                             <BR>
                         </a>
@@ -281,7 +279,9 @@
                 </div>
             </div>
     </div>
-
+<script>
+    document.getElementById("link_rates").setAttribute('href', `${window.location.href}rates`);
+</script>
 </body>
 
 </html>

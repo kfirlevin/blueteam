@@ -21,7 +21,7 @@ config = {
 }
 
 def buildPath(host,route,id=""):
-    return host + "/" + route + "/" + id
+    return str(host + "/" + route + "/" + str(id))
 
 def buildUrlParams(urlstr,params):
     urlstr += "?"
@@ -60,7 +60,7 @@ def handleBill(id):
         #hostlocal = os.environ.get('DB_HOST')
         #hostprod = "http://blue.develeap.com:8090"
         ratesfile = ps.read_excel(f'http://localhost:5000/rates')
-        weighthost = os.environ.get('WEIGHT_HOST')
+        weighthost = 'http://' + str(os.environ.get('WEIGHT_HOST'))
 
         # getting relevant rates by provider 
         ref_dict = {}
@@ -82,12 +82,15 @@ def handleBill(id):
         for truckID in trucksIdsByProv:
             try:
                 path=buildPath('http://localhost:5000', "truck", id=str(truckID))
-                #logging.info('path: '+ str(path))
-                req = requests.get(path + urlparams)
-                #logging.info('req: '+ str(req.content))
+                logging.info(' path: '+path + urlparams)
+                logging.info(' urlparams: ' + urlparams)
+                req = requests.get(str(path) + str(urlparams))
+                logging.info(' req: '+str(req.content))
                 allTrucksInfo.append(json.loads(req.content)["item"])
             except Exception as e:
                 logging.info('truckid error : ' + str(e))
+
+
         logging.info(allTrucksInfo)
         logging.info("LOGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         for truckData in allTrucksInfo:
@@ -97,10 +100,9 @@ def handleBill(id):
                 try:
                     logging.info(buildPath(weighthost, "session", id=str(sessionid)))
                     tmp = json.loads(requests.get(buildPath(weighthost, "session", id=str(sessionid)) + urlparams).content)
-                    
                     logging.info(tmp)
                     logging.info('tmp')
-                    if tmp["direction"] == "out":
+                    if tmp["session"]["direction"] == "out":
                         allSessions.append(tmp)
                         #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))
                 except Exception as e:

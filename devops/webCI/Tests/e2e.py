@@ -19,4 +19,6 @@ providers = os.system(
     'export URI=http://blue.develeap.com:8081/ && pytest ../../providers > providers.txt')
 weight = os.system(
     'export URI=http://blue.develeap.com:8082 && pytest ../../weight > weight.txt')
+os.system('cat providers.txt >> prolog.txt')
+os.system('cat weight.txt >> wlog.txt')
 print(testresult(providers, weight))

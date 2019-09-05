@@ -13,6 +13,7 @@ services:
       - '8081:5000'
     environment:
       - DB_HOST=prov-db-test
+      - WEIGHT_HOST=weight-server:5000
     volumes:
       - /home/${USER}/test-prov_rates/:/in/
 
@@ -23,6 +24,7 @@ services:
       - /home/${USER}/test-dbs/weight-data/:/var/lib/mysql
 
   weight-server:
+    container_name: weight-server
     build: ../../weight/
     ports:
       - '8082:5000'

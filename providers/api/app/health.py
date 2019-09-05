@@ -20,6 +20,7 @@ def health():
         'port': '3306',
         'database': 'billdb'
     }
+
     try:
         connection = mysql.connector.connect(**config)
         cursor = connection.cursor()

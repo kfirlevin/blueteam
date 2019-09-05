@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,abort
 import mysql.connector
 import datetime
 from typing import Dict, List
@@ -7,12 +7,14 @@ from classes.Weight import Weight
 from classes.Item import Item
 from classes.Transaction import Transaction
 import os
+import logging
 
 app = Flask(__name__)
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 config = {
   'user': 'db',
   'password': 'password',
-  'host': os.environ.get('MYSQL_HOST'),
+  'host': os.environ.get('DB_HOST'),
   'port': '3306',
   'database': 'weight',
   'raise_on_warnings': True
@@ -27,6 +29,8 @@ config = {
 # TODO Add Comments - Description
 @app.route('/')
 def index():
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.warning('is when this event was logged.')
     return render_template("index.html")
 
 
@@ -40,18 +44,109 @@ def health():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['POST'])
 def weight_post():
+    
     if request.method == 'GET':
             return render_template("weight-form.html")
+
+            
     elif request.method == 'POST':
-        id = request.form.get('id')
-        datetime = request.form.get('datetime')
+        force = False
         direction = request.form.get('direction')
-        truck = request.form.get('truck')
+        if direction not in ("out", "in", "none"):
+            return 'Not a valid direction', 404
+        truckId = request.form.get('truck')
+        if truckId is None:
+            return 'No truck id?', 404
+        time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
         containers = request.form.get('containers')
+        if containers is None:
+            return 'There are no containers?', 404
         bruto = request.form.get('bruto')
-        truckTara = request.form.get('truckTara')
+        if bruto is None:
+            return 'You forgot to enter weight', 404
         produce = request.form.get('produce')
-    if Connection.Mysql.isHealth() == True : 
+        if produce not in ("tomato", "orange"):
+            return 'Not a valid produce', 404
+        if request.form.get('force') == 'true':
+            force = True
+        truckTara = request.form.get('truckTara')
+        if  int(truckTara) < 0:
+                return 'Not a valid truckTara', 404
+
+
+        if truckId == "na":
+            query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+truckTara+","+ "'"+produce+ "'"+")"
+            Connection.Mysql.exec_query(query)
+            return "na to do"
+        
+
+        data=Weight.last_action(truckId,True)
+        logging.warning("this result {}".format(str(data)))
+
+        if direction == "in":
+            if data == "not found" or data[2] == 'out':
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+truckTara+","+ "'"+produce+ "'"+")"
+                result = Connection.Mysql.exec_query(query)
+                logging.warning("this result {}".format(str(result)))
+
+                return "INSERT"
+            elif data[2] == 'in':
+                if force:
+                    query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
+                    result =Connection.Mysql.exec_query(query)
+         
+                    logging.warning("this result {}".format(str(result)))
+                    return "UPDATE"
+                else:
+                    return "error: The truck entered the factory but never left"
+        elif direction == "out":
+            if data == "not found":
+                abort(404)
+            elif data[2] == 'in':
+                if not Weight.all_containers_here(str(containers).split(',')):
+                    return "containers not known in out", 404
+                else:
+                    if any(x in str(data[4]).split(',') for x in Weight.unknown_weights()):
+                        neto = "na"
+                    else:
+                        
+                        bruto =  data[5]
+                        truckTara = data[6]
+                        sum_weight_containers = 0
+                        for id_num in str(containers).split(','):
+                            sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
+                        neto = int(bruto) - sum_weight_containers - int(truckTara)
+                        query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,truckTara,neto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+str(bruto)+","+str(truckTara)+","+str(neto)+","+ "'"+produce+ "'"+")"
+                        result =Connection.Mysql.exec_query(query)
+
+                    session = {
+                    'id': truckId, # id of new transaction
+                    'truck': truckId,
+                    'bruto': data[5], #bruto of in
+                    'truckTara': bruto,
+                    'neto': neto
+                    }
+                    return jsonify ({'session': session})
+
+
+
+
+            elif data[2] == 'out':
+                if force:
+                    query="UPDATE transactions SET bruto = "+str(bruto) +" WHERE id = "+str(data[0])
+                    Connection.Mysql.exec_query(query)
+                else:
+                    abort(404)
+        else: #direction=out
+            if data[2] == 'in':
+                abort(404)
+            else:
+                query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + "," + "'" +direction+ "'"+","+"'"+truckId+"'" +","+ "'"+containers+"'"+","+bruto+","+ "'"+produce+ "'"+")"
+                Connection.Mysql.exec_query(query)
+
+        return("good"), 200
+
+    if Connection.Mysql.isHealth() == True:
         return Weight.weight_post(direction)
     return "Error: DB Connection"
 
@@ -60,29 +155,28 @@ def weight_post():
 # TODO Add Comments - Description
 @app.route('/weight', methods=['GET'])
 def weights_get():
-    if Connection.Mysql.isHealth() == True : 
-        return Weight.weights_get(request.args.get('from'),request.args.get('to'),request.args.get('filter'))
+    if Connection.Mysql.isHealth() == True:
+        return Weight.weights_get(request.args.get('from'), request.args.get('to'), request.args.get('filter'))
     return "Error: DB Connection"
 
 
-    
 # Author:
 # TODO Add Comments - Description
 @app.route('/unknown', methods=['GET'])
 def unknown_weights():
-    if Connection.Mysql.isHealth() == True : 
+    if Connection.Mysql.isHealth() == True:
         return Weight.unknown_weights()
     return "Error: DB Connection"
 
 
 # Author:
 # TODO Add Comments - Description
-@app.route('/batch-weight',  methods = ['GET', 'POST'])
+@app.route('/batch-weight',  methods=['GET', 'POST'])
 def batch_weight():
     if request.method == 'GET':
         return render_template("betch-weight.html")
     elif request.method == 'POST':
-        if Connection.Mysql.isHealth() == True : 
+        if Connection.Mysql.isHealth() == True:
 
             fileName = request.form.get('file')        
             return Weight.batch_weight(fileName)
@@ -90,11 +184,9 @@ def batch_weight():
         return "Error: DB Connection"
         
 
-
-
 # Author:
 # TODO Add Comments - Description
-#GET /weight?from=t1&to=t2&filter=f
+# GET /weight?from=t1&to=t2&filter=f
 @app.route('/all_con', methods=['GET'])
 def get_weight():
 
@@ -116,7 +208,7 @@ def get_weight():
 
 # Author:
 # TODO Add Comments - Description
-#GET /weight?from=t1&to=t2&filter=f
+# GET /weight?from=t1&to=t2&filter=f
 @app.route('/all_transactions', methods=['GET'])
 def get_transaction():
 
@@ -133,22 +225,33 @@ def get_transaction():
 
 # Author:
 # TODO Add Comments - Description
-## GET /item/<id>?from=t1&to=t2
-@app.route('/item/<string:id_num>', methods=['GET']) # TODO
+# GET /item/<id>?from=t1&to=t2
+@app.route('/item/<string:id_num>', methods=['GET'])  # TODO
 def get_item(id_num):
-    if Connection.Mysql.isHealth() == True : 
-        return Item.get_items(request.args.get('from'),request.args.get('to'),id_num)
+    if Connection.Mysql.isHealth() == True:
+        return Item.get_items(request.args.get('from'), request.args.get('to'), id_num)
     return "Error: DB Connection"
 
+
+@app.route('/add_weight', methods=['GET'])
+def add_weight():  
+    return render_template("weight-form.html")
 
 # Author: 
 # TODO Add Comments - Description
 #   GET /session/<id>
-@app.route('/session/<string:id_num>', methods=['GET']) # TODO
+@app.route('/session/<string:id_num>', methods=['GET'])  # TODO
 def get_session(id_num):
-    if Connection.Mysql.isHealth() == True : 
+    if Connection.Mysql.isHealth() == True:
         return Transaction.get_session(id_num)
     return "Error: DB Connection"
+
+@app.route('/container_weight/<string:id_num>', methods=['GET'])  # TODO
+def container_weight(id_num):
+    if Connection.Mysql.isHealth() == True:
+        return Weight.last_action(id_num,True)
+    return "Error: DB Connection"
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

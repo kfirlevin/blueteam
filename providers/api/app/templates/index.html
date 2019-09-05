@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="no-js">
+
+<head>
+    <title>PROVIDERS</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<script>
+    function get_health() 
+    {        
+        const Http = new XMLHttpRequest();
+        const url =`${window.location.href}health`
+        Http.open("GET", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.status)
+           result = document.getElementById("results")
+           result.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    };
+
+    function post_provider() 
+    {
+        const Http = new XMLHttpRequest();
+        value= document.getElementById("post_provider_text").value;
+        const url =`${window.location.href}provider?provider_name=${value}`
+        Http.open("POST", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    }
+
+    function put_provider() 
+    {
+        const Http = new XMLHttpRequest();
+        value_id= document.getElementById("put_provider_id").value;
+        value_name= document.getElementById("put_provider_name").value;
+        const url =`${window.location.href}provider/${value_id}?provider_name=${value_name}`;
+
+        Http.open("PUT", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    }
+
+    function post_rates() 
+    {
+        const Http = new XMLHttpRequest();
+        value_file_name= document.getElementById("post_rates_file").value;
+        const url =`${window.location.href}rates?file=${value_file_name}`;
+        Http.open("POST", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    }
+
+    function get_truck() 
+    {
+        const Http = new XMLHttpRequest();
+        value_from= document.getElementById("truck_from").value;
+        value_to= document.getElementById("truck_to").value;
+        value_id= document.getElementById("truck_id").value;
+        const url =`${window.location.href}truck/<${value_id}>?from=${value_from}&to=${value_to}`;
+        Http.open("GET", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+        }
+    }
+
+    function post_truck() 
+    {
+        const Http = new XMLHttpRequest();
+
+        value_truck_id= document.getElementById("post_truck_id").value;
+        value_provider_id= document.getElementById("post_provider_id").value;
+        const url =`${window.location.href}truck?id=${value_truck_id}&provider=${value_provider_id}`;
+        Http.open("POST", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    }
+
+    function put_truck() 
+    {
+        const Http = new XMLHttpRequest();
+
+        value_truck_id= document.getElementById("put_truck_id").value;
+        value_provider_id= document.getElementById("put_provider_id").value;
+        const url =`${window.location.href}truck?id=${value_truck_id}&provider=${value_provider_id}`;
+        Http.open("POST", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    }
+
+
+    function get_bill() 
+    {
+        const Http = new XMLHttpRequest();
+        value_from= document.getElementById("bill_from").value;
+        value_to= document.getElementById("bill_to").value;
+        value_id= document.getElementById("provider_id").value;
+        const url =`${window.location.href}bill/<${value_id}>?from=${value_from}&to=${value_to}`;
+        Http.open("GET", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText)
+            console.log(Http.status)
+           result_box = document.getElementById("results")
+           result_box.innerHTML=Http.responseText;
+           tag=document.getElementById("results_tag").innerHTML;
+           document.getElementById("results_tag").innerHTML="Results: "+Http.status;
+
+        }
+    }
+</script>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <div class="container ">
+                <h1>WELCOME TO PROVIDERS PORTAL</h1>
+                <h2>HEALTH</h2>
+                <form class="form-group">
+                <button type="button" class="btn btn-primary" onclick="get_health()">Check health</button>
+                <BR>
+                <BR>
+                <h2>PROVIDER API</h2>
+                <label for="post_provider_name">post provider name</label>
+                <input type="text" id="post_provider_text" name="post_provider_name">
+                <button name="post_provider_btn" type="button" class="btn btn-primary" onclick="(()=>{post_provider()})()">Post to Provider</button>
+                <BR>
+                <BR>
+
+                <label for="put_provider_id">put provider id</label>
+                <input type="text" id="put_provider_id">
+                <label for="put_provider_name">put provider name</label>
+                <input type="text" id="put_provider_name">
+                <button name="put_provider_btn" type="button" class="btn btn-primary" onclick="put_provider()">PUT to Provider</button>
+                <BR>
+                <BR>
+                <h2>RATES API</h2>
+                <a href="HTTP://localhost:8081/rates">
+                    <button name="get_rates_btn" type="button" class="btn btn-primary">GET rates</button>
+                </a>
+                <BR>
+                <label for="post_rates_file">File name</label>
+                <input type="text" id="post_rates_file" name="post_rates_file">
+                <button name="post_rates_btn" type="button" class="btn btn-primary" onclick="post_rates()">POST rates</button>
+                <BR>
+                <BR>
+                <H2>TRUCK API</H2>
+                <label for="truck_id">truck Id</label>
+                <input type="text" id="truck_id" name="truck_id">
+
+                <label for="truck_from">From</label>
+                <input type="text" id="truck_from" name="truck_from" placeholder="yyyymmddhhmmss">
+
+                <label for="truck_to">To</label>
+                <input type="text" id="truck_to" name="truck_to" placeholder="yyyymmddhhmmss">
+
+                <button name="truck_get_btn" type="button" class="btn btn-primary" onclick="get_truck()">GET truck</button>
+
+                <BR>
+                <BR>
+                <label for="post_truck_id">truck Id</label>
+                <input type="text" id="post_truck_id" name="post_truck_id">
+    
+                <label for="post_provider_id">provider Id</label>
+                <input type="text" id="post_provider_id" name="post_provider_id">
+
+                <button name="truck_post_btn" type="button" class="btn btn-primary" onclick="post_truck()">POST truck</button>
+                <BR>
+                <BR>
+
+                <label for="put_truck_id">truck Id</label>
+                <input type="text" id="put_truck_id" name="put_truck_id">
+        
+                <label for="put_provider_id">provider Id</label>
+                <input type="text" id="put_provider_id" name="put_provider_id">
+    
+                <button name="truck_put_btn" type="button" class="btn btn-primary" onclick="put_truck()">PUT truck</button>
+                <BR>
+                <BR>
+
+
+
+
+
+
+                <H2>BILL</H2>
+                <label for="provider_id_name">Provider Id</label>
+                <input type="text" id="provider_id" name="provider_id_name">
+
+                <label for="bill_from">From</label>
+                <input type="text" id="bill_from" name="bill_from" placeholder="yyyymmddhhmmss">
+
+                <label for="bill_to">To</label>
+                <input type="text" id="bill_to" name="bill_to" placeholder="yyyymmddhhmmss">
+                 
+                <button name="bill_get_btn" type="button" class="btn btn-primary" onclick="get_bill()">GET BILL</button>
+
+
+
+                <h3 id="results_tag">Results:</h3>
+            </div>
+            <div id="results" style="border:solid 1px BLACK; margin:auto;"></div>
+        </div>
+    </div>
+</body>
+
+</html>

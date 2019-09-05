@@ -20,9 +20,21 @@ config = {
 'database': 'billdb'
 }
 
+def buildPath(host,route,id=""):
+    return host + "/" + route + "/" + id
+
+def buildUrlParams(urlstr,params):
+    urlstr += "?"
+    for key in params:
+        urlstr += str(key) + "=" + str(params[key]) 
+
+
+
 #    Temporary mock
 @app.route('/sessionMock/<id>', methods=['GET'])
 def sessionMOCK(id):
+    From=request.args.get('from')
+    To=request.args.get('to')
     jsonMock = {
         "bruto": 1200, 
         "containers": "Containers", 
@@ -44,27 +56,52 @@ def handleBill(id):
         allTrucksInfo = []
         allSessions = []
         total_payment = 0
+        sessionCount = 0
+        hostlocal = os.environ.get('DB_HOST')
+        hostprod = "http://blue.develeap.com:8090"
         ratesfile = ps.read_excel(f'http://localhost:5000/rates')
-        #ratesfile = ps.read_excel("rates.xlsx",sheet_name = "rates")
+        weighthost = os.environ.get('WEIGHT_HOST')
+
         # getting relevant rates by provider 
         ref_dict = {}
         for index, row in ratesfile.iterrows():
             if str(id) == str(row["Scope"]) or row["Scope"] == "All":
                 ref_dict[str(row["Product"]).lower()] = row["Rate"]
 
-        sessionCount = 0
+        #session_request_path = buildPath(hostprod, "session", id=id)
+        if From:
+            if To:
+                urlparams = f'?from={From}&to={To}'
+            else:
+                urlparams = f'?from={From}'
+        else:
+            if To:
+                urlparams = f'?to={To}'
+            else:
+                urlparams = f''
         for truckID in trucksIdsByProv:
             try:
-                allTrucksInfo.append(json.loads(requests.get(f'http://localhost:5000/truck/{truckID}?from=20000101150000').content["name"])["item"])
+                path=buildPath('http://localhost:5000', "truck", id=str(truckID))
+                logging.info('path: '+path)
+                req = requests.get(path + urlparams)
+                logging.info('req: '+req)
+                allTrucksInfo.append(json.loads(req.content)["item"])
             except Exception:
                 pass
         logging.info(allTrucksInfo)
+        logging.info("LOGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         for truckData in allTrucksInfo:
             sessionCount += len(truckData["sessions"])
+            logging.info('sessionCount: ' + str(sessionCount))
             for sessionid in truckData["sessions"]:
+                logging.info('sessionid: '+ str(sessionid))
                 try:
-                    tmp = json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content)
-                    if tmp["direction"] == "out"
+                    logging.info(buildPath(hostlocal, "session", id=str(sessionid)))
+                    tmp = json.loads(requests.get(buildPath(hostlocal, "session", id=str(sessionid)) + urlparams).content)
+                    
+                    logging.info(tmp)
+                    logging.info('tmp')
+                    if tmp["direction"] == "out":
                         allSessions.append(tmp)
                         #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))
                 except Exception:
@@ -74,6 +111,7 @@ def handleBill(id):
         except Exception:
             name = "not exist"
         Bill = {
+            
             "id"   : id,
             "name" : name ,
             "from" : From,
@@ -90,7 +128,6 @@ def handleBill(id):
             "rate"  : 0 ,
             "pay"   : 1000
         })
-        logging.info(Bill["products"])
         for sessionData in allSessions:
             new_product = str(sessionData["produce"]).lower()
             for index in Bill["products"]:
@@ -118,4 +155,4 @@ def handleBill(id):
                     total_payment += index["pay"]
         Bill["total"] = total_payment
         logging.info(Bill)
-        return "A"
+        return Bill

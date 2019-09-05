@@ -22,9 +22,6 @@ config = {
 }
 
 
-# @app.route('/weight', methods=['POST'])
-# def saveWeight():
-
 
 # Author:
 # TODO Add Comments - Description
@@ -70,12 +67,11 @@ def weight_post():
             return 'Not a valid produce', 404
         if request.form.get('force') == 'true':
             force = True
-
+        
         query="select id from transactions order by datetime desc limit 1;"
         NewID=Connection.Mysql.exec_query(query)
         NewID=str(int(NewID[0][0])+1)
         neto=0
-
         if truckId == "na":
             query = "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + \
                 "," + "'" + direction + "'"+","+"'"+truckId+"'" + "," + \
@@ -144,8 +140,8 @@ def weight_post():
                 abort(404)
             else:
                 query = "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + \
-                    "," + "'" + direction + "'"+","+"'"+truckId+"'" + "," + \
-                        "'"+containers+"'"+","+bruto+"," + "'"+produce + "'"+")"
+                    "," + "'" + str(direction) + "'"+","+"'"+str(truckId)+"'" + "," + \
+                        "'"+str(containers)+"'"+","+bruto+"," + "'"+str(produce) + "'"+")"
                 Connection.Mysql.exec_query(query)
                 return jsonify(id=NewID, truck=truckId, bruto=bruto)
 

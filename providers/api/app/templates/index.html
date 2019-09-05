@@ -176,93 +176,112 @@
     <div class="container">
         <div class="jumbotron">
             <div class="container ">
-                <h1>WELCOME TO PROVIDERS PORTAL</h1>
-                <h2>HEALTH</h2>
-                <form class="form-group">
-                <button type="button" class="btn btn-primary" onclick="get_health()">Check health</button>
-                <BR>
-                <BR>
-                <h2>PROVIDER API</h2>
-                <label for="post_provider_name">post provider name</label>
-                <input type="text" id="post_provider_text" name="post_provider_name">
-                <button name="post_provider_btn" type="button" class="btn btn-primary" onclick="(()=>{post_provider()})()">Post to Provider</button>
-                <BR>
-                <BR>
+                    <h1>WELCOME TO PROVIDERS</h1>
+                    <div id="row2" class="row">
+                            <div class="col-md-4">
+                            <div id="container4" style="border: solid 1px black;margin:auto;height:300px">
+                                    <h4>HEALTH TEST</h4>
+                                    <form class="form-group">
+                                    <button type="button" class="btn btn-primary" onclick="get_health()">Check health</button>
+                                    
+                            </div>
+                        </div>
+                            <div class="col-md-4">
+                            <div id="container5" style="border: solid 1px black; height:300px;">
+                                    <h4>PROVIDER API TEST</h4>
 
-                <label for="put_provider_id">put provider id</label>
-                <input type="text" id="put_provider_id">
-                <label for="put_provider_name">put provider name</label>
-                <input type="text" id="put_provider_name">
-                <button name="put_provider_btn" type="button" class="btn btn-primary" onclick="put_provider()">PUT to Provider</button>
-                <BR>
-                <BR>
-                <h2>RATES API</h2>
-                <a id="link_rates" href="HTTP://localhost:8081/rates">
-                    <button name="get_rates_btn" type="button" class="btn btn-primary">GET rates</button>
-                </a>
-                <BR>
-                <label for="post_rates_file">File name</label>
-                <input type="text" id="post_rates_file" name="post_rates_file">
-                <button name="post_rates_btn" type="button" class="btn btn-primary" onclick="post_rates()">POST rates</button>
-                <BR>
-                <BR>
-                <H2>TRUCK API</H2>
-                <label for="truck_id">truck Id</label>
-                <input type="text" id="truck_id" name="truck_id">
-
-                <label for="truck_from">From</label>
-                <input type="text" id="truck_from" name="truck_from" placeholder="yyyymmddhhmmss">
-
-                <label for="truck_to">To</label>
-                <input type="text" id="truck_to" name="truck_to" placeholder="yyyymmddhhmmss">
-
-                <button name="truck_get_btn" type="button" class="btn btn-primary" onclick="get_truck()">GET truck</button>
-
-                <BR>
-                <BR>
-                <label for="post_truck_id">truck Id</label>
-                <input type="text" id="post_truck_id" name="post_truck_id">
-    
-                <label for="post_provider_id">provider Id</label>
-                <input type="text" id="post_provider_id" name="post_provider_id">
-
-                <button name="truck_post_btn" type="button" class="btn btn-primary" onclick="post_truck()">POST truck</button>
-                <BR>
-                <BR>
-
-                <label for="put_truck_id">truck Id</label>
-                <input type="text" id="put_truck_id" name="put_truck_id">
-        
-                <label for="put_provider_id">provider Id</label>
-                <input type="text" id="put_provider_id" name="put_provider_id">
-    
-                <button name="truck_put_btn" type="button" class="btn btn-primary" onclick="put_truck()">PUT truck</button>
-                <BR>
-                <BR>
-
-
-
-
-
-
-                <H2>BILL</H2>
-                <label for="provider_id_name">Provider Id</label>
-                <input type="text" id="provider_id" name="provider_id_name">
-
-                <label for="bill_from">From</label>
-                <input type="text" id="bill_from" name="bill_from" placeholder="yyyymmddhhmmss">
-
-                <label for="bill_to">To</label>
-                <input type="text" id="bill_to" name="bill_to" placeholder="yyyymmddhhmmss">
-                 
-                <button name="bill_get_btn" type="button" class="btn btn-primary" onclick="get_bill()">GET BILL</button>
-
-
-
-                <h3 id="results_tag">Results:</h3>
-            </div>
-            <div id="results" style="border:solid 1px BLACK; margin:auto;"></div>
-        </div>
+                                    <label for="post_provider_name">post provider name</label>
+                                    <input type="text" id="post_provider_text" name="post_provider_name">
+                                    <button name="post_provider_btn" type="button" class="btn btn-primary" onclick="(()=>{post_provider()})()">Post to Provider</button>
+                                    <BR>
+                                    <BR>
+                    
+                                    <label for="put_provider_id">put provider id</label>
+                                    <input type="text" id="put_provider_id">
+                                    <label for="put_provider_name">put provider name</label>
+                                    <input type="text" id="put_provider_name">
+                                    <button name="put_provider_btn" type="button" class="btn btn-primary" onclick="put_provider()">PUT to Provider</button>
+                                    <BR>
+                                    <BR>
+                            </div>
+                        </div>
+                            <div class="col-md-4">
+                            <div id="container6" style="border: solid 1px black;height:300px">
+                                    <h4>RATES API TEST</h4>
+                                    <a id="link_rates" href="HTTP://localhost:8081/rates">
+                                        <button name="get_rates_btn" type="button" class="btn btn-primary">GET rates</button>
+                                        <BR>
+                                    </a>
+                                    <BR>
+                                    <label for="post_rates_file">File name</label>
+                                    <input type="text" id="post_rates_file" name="post_rates_file">
+                                    <button name="post_rates_btn" type="button" class="btn btn-primary" onclick="post_rates()">POST rates</button>
+                                    <BR>
+                                    <BR>
+                            </div>
+                        </div>
+                        </div>
+                        <div id="row3" class="row">
+                            <div class="col-md-4">
+                            <div id="container8" style="border: solid 1px black;height:450px">
+                                    <H4>TRUCK API</H4>
+                                    <label for="truck_id">truck Id</label>
+                                    <input type="text" id="truck_id" name="truck_id">
+                                <BR>
+                                    <label for="truck_from">From</label>
+                                    <input type="text" id="truck_from" name="truck_from" placeholder="yyyymmddhhmmss">
+                                    <BR>
+                                    <label for="truck_to">To</label>
+                                    <input type="text" id="truck_to" name="truck_to" placeholder="yyyymmddhhmmss">
+                    
+                                    <button name="truck_get_btn" type="button" class="btn btn-primary" onclick="get_truck()">GET truck</button>
+                    
+                                    <BR>
+                                    <BR>
+                                    <label for="post_truck_id">truck Id</label>
+                                    <input type="text" id="post_truck_id" name="post_truck_id">
+                                        <BR>
+                                    <label for="post_provider_id">provider Id</label>
+                                    <input type="text" id="post_provider_id" name="post_provider_id">
+                    
+                                    <button name="truck_post_btn" type="button" class="btn btn-primary" onclick="post_truck()">POST truck</button>
+                                    <BR>
+                                    <BR>
+                    
+                                    <label for="put_truck_id">truck Id</label>
+                                    <input type="text" id="put_truck_id" name="put_truck_id">
+                                    <BR>
+                                    <label for="put_provider_id">provider Id</label>
+                                    <input type="text" id="put_provider_id" name="put_provider_id">      
+                                    <button name="truck_put_btn" type="button" class="btn btn-primary" onclick="put_truck()">PUT truck</button>
+                            </div>
+                        </div>
+                            <div class="col-md-4">
+                            <div id="container9" style="border: solid 1px black;height:450px;">
+                                    <H4>BILL API TEST</H4>
+                                    <label for="provider_id_name">Provider Id</label>
+                                    <input type="text" id="provider_id" name="provider_id_name">
+                    
+                                    <label for="bill_from">From</label>
+                                    <input type="text" id="bill_from" name="bill_from" placeholder="yyyymmddhhmmss">
+                    
+                                    <label for="bill_to">To</label>
+                                    <input type="text" id="bill_to" name="bill_to" placeholder="yyyymmddhhmmss">
+                                     
+                                    <button name="bill_get_btn" type="button" class="btn btn-primary" onclick="get_bill()">GET BILL</button>
+                    
+                            </div>
+                        </div>
+                            <div class="col-md-4">
+                            <div id="container10" style="border:solid 1px BLACK; height:450px;">
+                                <h3 id="results_tag">Results:</h3>
+                                </div>
+                                <div id="results" ></div>
+                           
+                            </div>
+                        </div>
+                        </div>
+  </div>
     </div>
 </body>
 

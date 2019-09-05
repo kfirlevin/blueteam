@@ -1,7 +1,7 @@
 #!/bin/python
-import os
 import telebot
 import datetime
+import subprocess
 
 # czdvf
 
@@ -16,8 +16,6 @@ def testresult(providers, weight):
         return "False"
 
 
-providers = os.system(
-    'export URI=http://blue.develeap.com:8081/ && pytest ../../providers > providers.txt')
-weight = os.system(
-    'export URI=http://blue.develeap.com:8082/ && pytest ../../weight > weight.txt')
+providers = subprocess.Popen('./prov.sh')
+weight = subprocess.Popen('./weight.sh')
 print(testresult(providers, weight))

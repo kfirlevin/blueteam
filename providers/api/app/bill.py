@@ -57,8 +57,8 @@ def handleBill(id):
         allSessions = []
         total_payment = 0
         sessionCount = 0
-        hostlocal = os.environ.get('DB_HOST')
-        hostprod = "http://blue.develeap.com:8090"
+        #hostlocal = os.environ.get('DB_HOST')
+        #hostprod = "http://blue.develeap.com:8090"
         ratesfile = ps.read_excel(f'http://localhost:5000/rates')
         weighthost = os.environ.get('WEIGHT_HOST')
 
@@ -82,30 +82,29 @@ def handleBill(id):
         for truckID in trucksIdsByProv:
             try:
                 path=buildPath('http://localhost:5000', "truck", id=str(truckID))
-                logging.info('path: '+path)
+                #logging.info('path: '+ str(path))
                 req = requests.get(path + urlparams)
-                logging.info('req: '+req)
+                #logging.info('req: '+ str(req.content))
                 allTrucksInfo.append(json.loads(req.content)["item"])
-            except Exception:
-                pass
+            except Exception as e:
+                logging.info('truckid error : ' + str(e))
         logging.info(allTrucksInfo)
         logging.info("LOGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         for truckData in allTrucksInfo:
             sessionCount += len(truckData["sessions"])
-            logging.info('sessionCount: ' + str(sessionCount))
             for sessionid in truckData["sessions"]:
                 logging.info('sessionid: '+ str(sessionid))
                 try:
-                    logging.info(buildPath(hostlocal, "session", id=str(sessionid)))
-                    tmp = json.loads(requests.get(buildPath(hostlocal, "session", id=str(sessionid)) + urlparams).content)
+                    logging.info(buildPath(weighthost, "session", id=str(sessionid)))
+                    tmp = json.loads(requests.get(buildPath(weighthost, "session", id=str(sessionid)) + urlparams).content)
                     
                     logging.info(tmp)
                     logging.info('tmp')
                     if tmp["direction"] == "out":
                         allSessions.append(tmp)
                         #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))
-                except Exception:
-                    pass
+                except Exception as e:
+                    logging.info('get session data error : ' + str(e))
         try:
             name = json.loads(requests.get(f'http://localhost:5000/provider/{id}').content)["name"]
         except Exception:
@@ -122,10 +121,10 @@ def handleBill(id):
             "total" : 0
         }
         Bill["products"].append({
-            "product" : "tomato" ,
+            "product" : "apple" ,
             "count" : 1 ,
             "amount": 500 ,
-            "rate"  : 0 ,
+            "rate"  : 1 ,
             "pay"   : 1000
         })
         for sessionData in allSessions:

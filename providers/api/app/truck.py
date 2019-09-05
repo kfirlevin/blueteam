@@ -99,6 +99,7 @@ def handleTruck():
     if request.method == 'PUT':
         trcukId=request.args.get('id')
         providerId=request.args.get('provider')
+        logging.info(trcukId,providerId)
         res = truckPut(trcukId,providerId)
         if 'error' in str(res):
             return str(res),500

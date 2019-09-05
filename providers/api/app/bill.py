@@ -21,7 +21,7 @@ config = {
 }
 
 def buildPath(host,route,id=""):
-    return host + "/" + route + "/" + id
+    return str(host + "/" + route + "/" + str(id))
 
 def buildUrlParams(urlstr,params):
     urlstr += "?"
@@ -57,10 +57,10 @@ def handleBill(id):
         allSessions = []
         total_payment = 0
         sessionCount = 0
-        hostlocal = os.environ.get('DB_HOST')
-        hostprod = "http://blue.develeap.com:8090"
+        #hostlocal = os.environ.get('DB_HOST')
+        #hostprod = "http://blue.develeap.com:8090"
         ratesfile = ps.read_excel(f'http://localhost:5000/rates')
-        weighthost = os.environ.get('WEIGHT_HOST')
+        weighthost = 'http://' + str(os.environ.get('WEIGHT_HOST'))
 
         # getting relevant rates by provider 
         ref_dict = {}
@@ -82,30 +82,28 @@ def handleBill(id):
         for truckID in trucksIdsByProv:
             try:
                 path=buildPath('http://localhost:5000', "truck", id=str(truckID))
-                logging.info('path: '+path)
-                req = requests.get(path + urlparams)
-                logging.info('req: '+req)
+                req = requests.get(str(path) + str(urlparams))
+                logging.info(' req: '+str(req.content))
                 allTrucksInfo.append(json.loads(req.content)["item"])
-            except Exception:
-                pass
+            except Exception as e:
+                logging.info('truckid error : ' + str(e))
+
+
         logging.info(allTrucksInfo)
-        logging.info("LOGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         for truckData in allTrucksInfo:
             sessionCount += len(truckData["sessions"])
-            logging.info('sessionCount: ' + str(sessionCount))
             for sessionid in truckData["sessions"]:
                 logging.info('sessionid: '+ str(sessionid))
                 try:
-                    logging.info(buildPath(hostlocal, "session", id=str(sessionid)))
-                    tmp = json.loads(requests.get(buildPath(hostlocal, "session", id=str(sessionid)) + urlparams).content)
-                    
+                    logging.info(buildPath(weighthost, "session", id=str(sessionid)))
+                    tmp = json.loads(requests.get(buildPath(weighthost, "session", id=str(sessionid)) + urlparams).content)
                     logging.info(tmp)
                     logging.info('tmp')
-                    if tmp["direction"] == "out":
-                        allSessions.append(tmp)
+                    if tmp["session"]["direction"] == "out":
+                        allSessions.append(tmp["session"])
                         #allSessions.append(json.loads(requests.get(f'http://blue.develeap.com:8090/session/{sessionid}').content))
-                except Exception:
-                    pass
+                except Exception as e:
+                    logging.info('get session data error : ' + str(e))
         try:
             name = json.loads(requests.get(f'http://localhost:5000/provider/{id}').content)["name"]
         except Exception:
@@ -121,13 +119,14 @@ def handleBill(id):
             "products":[] , 
             "total" : 0
         }
-        Bill["products"].append({
-            "product" : "tomato" ,
-            "count" : 1 ,
-            "amount": 500 ,
-            "rate"  : 0 ,
-            "pay"   : 1000
-        })
+        # Bill["products"].append({
+        #     "product" : "apple" ,
+        #     "count" : 1 ,
+        #     "amount": 500 ,
+        #     "rate"  : 1 ,
+        #     "pay"   : 1000
+        # })
+        flag_update = 0
         for sessionData in allSessions:
             new_product = str(sessionData["produce"]).lower()
             for index in Bill["products"]:
@@ -142,7 +141,7 @@ def handleBill(id):
                         "rate"  : ref_dict[new_product] ,
                         "pay"   : index["pay"]+(sessionData["neto"]*ref_dict[new_product])
                     })
-                    total_payment += index["pay"]
+                    total_payment += (sessionData["neto"]*ref_dict[new_product])
             # if product does not exist, creat one    
             if flag_update == 0:
                     Bill["products"].append({
@@ -152,7 +151,7 @@ def handleBill(id):
                         "rate"  : ref_dict[new_product] ,
                         "pay"   : sessionData["neto"]*ref_dict[new_product]
                     })
-                    total_payment += index["pay"]
+                    total_payment += sessionData["neto"]*ref_dict[new_product]
         Bill["total"] = total_payment
         logging.info(Bill)
         return Bill

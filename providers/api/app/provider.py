@@ -17,7 +17,6 @@ def sql(value,req):
     'port': '3306',
     'database': 'billdb'
     }
-
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
     try:
@@ -32,19 +31,27 @@ def sql(value,req):
         connection.close()
         return re
     except:
-        logging.error(f"{value} FAILD!!!!!")
+        logging.error(f"{value} FAILED!!!!!")
         return "ERROR"
 
 
 @app.route('/provider', methods=["GET"])
 def provider_get():
-        return "WELCOM to providers please use PUT or POST request"
+        return "WELCOME to providers please use PUT or POST request"
+
+@app.route('/provider/<provider_id>', methods=["GET"])
+def provider_get_id(provider_id):
+        value=provider_id
+        hh=sql(f"SELECT name from Provider WHERE id='{value}' ",True)
+        if (hh != "ERROR"):
+                v1=hh[0]
+                return "{\"name\":\""+str(v1[-1])+"\"}"
 
 @app.route('/provider', methods=["POST"])
 def provider():
         value=request.args["provider_name"]
-        logging.info(f"INSERT {value} IN TO PROVIDER")
-        sql(f"INSERT INTO Provider (`name`) VALUES ('{value}')",True)
+        logging.info(f"INSERT {value} INTO PROVIDER")
+        sql(f"INSERT INTO Provider (`name`) VALUES ('{value}')",False)
         hh=sql(f"SELECT id from Provider WHERE name='{value}' ",True)
         if (hh != "ERROR"):
                 v1=hh[0]

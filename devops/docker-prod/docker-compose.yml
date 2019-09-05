@@ -15,6 +15,7 @@ services:
       - /home/${USER}/prod-prov_rates/:/in/
     environment:
       - DB_HOST=prov-db-prod
+      - WEIGHT_HOST=weight-server:5000
 
   weight-db:
     container_name: weight-db-prod

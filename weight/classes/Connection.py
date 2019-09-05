@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+import logging
 
 config = {
     'user': 'db',
@@ -13,19 +14,22 @@ config = {
 
 class Mysql(object):
 
-    # execute Query
+    @staticmethod      # execute Query
     def exec_query(sql_select_Query):
         try:
+            logging.warning("execute Query :  {} ".format(str(sql_select_Query)))
             cnx = mysql.connector.connect(**config)
             cursor = cnx.cursor()
             cursor.execute(sql_select_Query)
             rows = cursor.fetchall()
+            cnx.close()
+            return rows
         except mysql.connector.Error as err:
-            print(err)
+            logging.warning("Error execute Query :  {} ".format(str(err)))
             return 'Failure', 500, err
-        cnx.close()
-        return rows
+        
 
+    @staticmethod
     def health():
         try:
             cnx = mysql.connector.connect(**config)
@@ -35,6 +39,7 @@ class Mysql(object):
         cnx.close()
         return 'OK', 200
 
+    @staticmethod
     def isHealth():
         try:
             cnx = mysql.connector.connect(**config)

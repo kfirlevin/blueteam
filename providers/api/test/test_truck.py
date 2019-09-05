@@ -8,6 +8,7 @@ def test_truck_post_good():
     assert req1.status_code == 200
     json1 = json.loads(req1.content)
     req = requests.post(URI + 'truck?provider='+json1['id']+'&id='+str(random.randint(1, 9999999)))
+    
     assert req.status_code == 200
 def test_truck_post_bad():
     req = requests.post(URI + 'provider?provid_name=test21')

@@ -128,7 +128,7 @@
         value_truck_id = document.getElementById("put_truck_id").value;
         value_provider_id = document.getElementById("put_provider_id").value;
         const url = `${window.location.href}truck?id=${value_truck_id}&provider=${value_provider_id}`;
-        Http.open("POST", url);
+        Http.open("PUT", url);
         Http.send();
         Http.onreadystatechange = (e) => {
             console.log(Http.responseText)

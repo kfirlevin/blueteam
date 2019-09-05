@@ -22,9 +22,6 @@ config = {
 }
 
 
-# @app.route('/weight', methods=['POST'])
-# def saveWeight():
-
 
 # Author:
 # TODO Add Comments - Description
@@ -70,12 +67,11 @@ def weight_post():
             return 'Not a valid produce', 404
         if request.form.get('force') == 'true':
             force = True
-
+        
         query="select id from transactions order by datetime desc limit 1;"
         NewID=Connection.Mysql.exec_query(query)
         NewID=str(int(NewID[0][0])+1)
         neto=0
-
         if truckId == "na":
             query = "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + \
                 "," + "'" + direction + "'"+","+"'"+truckId+"'" + "," + \
@@ -122,21 +118,40 @@ def weight_post():
                         sum_weight_containers = 0
                         for id_num in str(containers).split(','):
                             sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
-                        newBruto = int(truckTara) + sum_weight_containers
+                        newBruto = oldBruto
                         if neto != "na":
                             neto = int(oldBruto) - sum_weight_containers - int(truckTara)
                         produce=data[8]
                         query="INSERT INTO transactions(datetime,direction,truck,containers,bruto,neto,produce,truckTara) VALUES(" + time_actual + "," + "'" +str(direction)+ "'"+","+"'"+str(truckId)+"'" +","+ "'"+str(containers)+"'"+","+str(newBruto)+","+str(neto)+","+ "'"+str(produce)+ "'"+","+"'"+str(truckTara)+"'"+")"
                         Connection.Mysql.exec_query(query)
                     
-                    return jsonify(id=NewID,truck=truckId,bruto=newBruto,truckTara=truckTara,neto=neto)
+                    return jsonify(id=NewID,truck=truckId, bruto=oldBruto, truckTara=truckTara,neto=neto)
 
             elif data[2] == 'out':
+                
+                
                 if force:
-                    query = "UPDATE transactions SET bruto = " + \
-                        str(bruto) + " WHERE id = "+str(data[0])
-                    Connection.Mysql.exec_query(query)
-                    return jsonify (id=data[0],truck=truckId)
+                    data_special_case = Weight.last_action(truckId, False, True)
+                    containers=str(data_special_case[4])
+                    if not Weight.all_containers_here(str(containers).split(',')):
+                        return "containers not known in out", 404
+                    else:
+                        if any(x in str(data_special_case[4]).split(',') for x in Weight.unknown_weights()):
+                            neto = "na"
+                        else:
+                            truckTara = bruto #The weight of the truck in the 2nd weighing 
+                            oldBruto =  (data_special_case[5])
+                            sum_weight_containers = 0
+                            for id_num in str(containers).split(','):
+                                sum_weight_containers = sum_weight_containers + int(Weight.container_weight(id_num)) 
+                            newBruto = oldBruto
+                            if neto != "na":
+                                neto = int(oldBruto) - sum_weight_containers - int(truckTara)
+                            produce=data[8]
+                        query = "UPDATE transactions SET bruto = " + \
+                            str(newBruto) + " neto = "+str(neto) + " truckTara= " +str(truckTara) + " WHERE id = "+str(data[0])
+                        Connection.Mysql.exec_query(query)
+                        return jsonify (id=data[0],truck=truckId, bruto=oldBruto, truckTara=truckTara,neto=neto )
                 else:
                     return "How can a track get out when it never got in?", 404
         else: #direction=none
@@ -144,8 +159,8 @@ def weight_post():
                 abort(404)
             else:
                 query = "INSERT INTO transactions(datetime,direction,truck,containers,bruto,produce) VALUES(" + time_actual + \
-                    "," + "'" + direction + "'"+","+"'"+truckId+"'" + "," + \
-                        "'"+containers+"'"+","+bruto+"," + "'"+produce + "'"+")"
+                    "," + "'" + str(direction) + "'"+","+"'"+str(truckId)+"'" + "," + \
+                        "'"+str(containers)+"'"+","+bruto+"," + "'"+str(produce) + "'"+")"
                 Connection.Mysql.exec_query(query)
                 return jsonify(id=NewID, truck=truckId, bruto=bruto)
 

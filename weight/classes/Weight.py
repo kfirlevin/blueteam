@@ -139,7 +139,7 @@ class Weight():
             abort(404)
         return str(rows[0][1])
 
-    def last_action(id_num,direction,in_direction):
+    def last_action(id_num,direction,in_direction=False):
         if in_direction:
             sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " and direction=" + "'in'" + " order by datetime desc limit 1" 
         if direction:

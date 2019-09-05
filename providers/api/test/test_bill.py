@@ -10,4 +10,4 @@ def test_bill_get():
     assert req.status_code == 200
 def test_bill_get_bad():
     req = requests.get(URI + 'bill/883726')
-    assert req.status_code != 200
+    assert req.status_code == 200

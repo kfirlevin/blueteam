@@ -23,12 +23,11 @@ class Weight():
 
     ################################################################
     # get weights between to points (duration)  t1 - t2 & filter
-    #   - t1 - start time 
-    #   - t2 - end time
+    #   -  t1,t2 - date-time stamps, formatted as yyyymmddhhmmss. server time is assumed.
+    #   -  f - comma delimited list of directions. default is "in,out,none"
     #   - filter = “in,out,none”
-    #  - default from - start day in week
-    #  - default to  - now
-    #  - default filter = “in,out,none”
+    #   - default t1 is "today at 000000". default t2 is "now". 
+    #   - Returns an array of json objects, one per weighing 
     ################################################################
     
     @staticmethod
@@ -36,18 +35,33 @@ class Weight():
 
         time_actual = datetime.datetime.now().strftime("%Y%m%d%I%M%S")
 
+
+        ##############################    Valid start_time argument   ###########################        
         if time_from is None:
             t1 = datetime.datetime.now().strftime("%Y%m%d"+"000000")
+            logging.warning("query run with default Time ' :  {} - 404 ".format(str(t1)))            
         elif Weight.validate(str(time_from)):
             t1 = time_from
         else:
+            logging.warning("datetime is not valid ' :  {} - 404 ".format(str(time_from)))
             abort(404)
+
+
+        ##############################    Valid end_time  argument   ###########################
+
         if time_to is None:
             t2 = time_actual
+            logging.warning("item id is not valid 'None' :  {} - 404 ".format(str(t2)))
+
         elif Weight.validate(str(time_to)):
             t2 = time_to
+            logging.warning("query run with default Time ' :  {} - 404 ".format(str(t2)))
         else:
+            logging.warning("datetime is not valid ' :  {} - 404 ".format(str(time_to)))
             abort(404)
+
+        ##############################     execute Query       ###########################
+
         f = []
         if filter is None:
             f = ["in", "out", "none"]
@@ -79,6 +93,8 @@ class Weight():
 
         return jsonify({'transactions': list_of_transactions})
 
+ 
+    # Returns a list of all recorded containers that have unknown weight
     @staticmethod
     def unknown_weights():
         list_of_unknown = []
@@ -89,6 +105,9 @@ class Weight():
             if not str(row[1]).isdigit():
                 list_of_unknown.append(row[0])
         return list_of_unknown
+    
+    # upload list of tara weights from a file in "/in" folder. Usually used to accept a batch of new containers. 
+    # File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"unit":..},...])
     @staticmethod
     def batch_weight(fileName):
         flag = False
@@ -151,12 +170,15 @@ class Weight():
     def container_weight(id_num):
         sql_select_Query = "select * from containers_registered where container_id=" + "'" + id_num + "'"
         rows = Connection.Mysql.exec_query(sql_select_Query)
-
         if not rows:
             abort(404)
         return str(rows[0][1])
+    
+    
     @staticmethod
-    def last_action(id_num,direction):
+    def last_action(id_num,direction,in_direction=False):
+        if in_direction:
+            sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " and direction=" + "'in'" + " order by datetime desc limit 1" 
         if direction:
             sql_select_Query = "select * from transactions where truck=" + "'" + id_num + "'" + " and direction in " + "('in','out')" + " order by datetime desc limit 1" 
         else:
@@ -167,6 +189,8 @@ class Weight():
             return "not found"
             
         return rows[0]
+   
+   
     @staticmethod
     def all_containers_here(containers_list):
         for id_num in containers_list:

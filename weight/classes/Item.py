@@ -28,7 +28,7 @@ class Item():
         elif Weight.validate(str(time_from)):
             t1 = time_from
         else:
-            logging.warning("datetime is not valid ' :  {} - 404 ".format(str(t1)))
+            logging.warning("datetime is not valid ' :  {} - 404 ".format(str(time_from)))
             abort(404)
        
         ##############################    Valid end_time  argument   ###########################
@@ -40,7 +40,7 @@ class Item():
             logging.warning("query run with default Time ' :  {} - 404 ".format(str(t2)))
 
         else:
-            logging.warning("datetime is not valid ' :  {} - 404 ".format(str(t2)))
+            logging.warning("datetime is not valid ' :  {} - 404 ".format(str(time_to)))
             abort(404)
 
  
